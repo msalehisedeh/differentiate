@@ -1,0 +1,28 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{ title }}!
+  </h1>
+</div>
+<div class="selection-wrapper">
+  <select (change)="leftSideSelection($event)">
+    <option *ngFor="let option of options" 
+            [value]="option" 
+            [selected]="selectedLeft===option"
+            [textContent]="option"></option>
+  </select>
+  <select (change)="leftrightSideSelection($event)">
+    <option *ngFor="let option of options" 
+            [value]="option" 
+            [selected]="selectedRight===option"
+            [textContent]="option"></option>
+  </select>
+</div>
+<differentiate 
+    [leftSideObject]="lefttree" 
+    [rightSideObject]="righttree"></differentiate>
+    
+<div class="json-wrapper">
+  <div class="json-view left" [innerHTML]="lefttree | json"></div>
+  <div class="json-view right" [innerHTML]="righttree | json"></div>  
+</div>

@@ -1,0 +1,35 @@
+.selection-wrapper {
+    box-sizing: border-box;
+    display: block;
+    position: relative;
+
+    select {
+        float: left;
+        width: 50%;
+    }
+}
+.json-wrapper {
+    border: 1px solid #888;
+    background-color: #eee;
+    border-radius: 5px;
+    box-sizing: border-box;
+    display: block;
+    max-height: 222px;
+    overflow-y: auto;
+    position: relative;
+
+    .json-view {
+        box-sizing: border-box;
+        display: block;
+        font-family: monospace;
+        float: left;
+        padding: 5px;
+        unicode-bidi: embed;
+        width: 50%;
+        white-space: pre-wrap;
+    }
+}
+.selected {
+    font-weight: bold;
+    color: red;
+}

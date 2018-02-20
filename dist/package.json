@@ -1,0 +1,37 @@
+{
+  "name": "differentiate",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "lint": "ng lint",
+    "packagr": "ng-packagr -p ng-package.json"
+  },
+  "private": false,
+  "dependencies": {
+    "@angular/common": "^5.0.0",
+    "@angular/compiler": "^5.0.0",
+    "@angular/core": "^5.0.0",
+    "core-js": "^2.4.1",
+    "zone.js": "^0.8.14",
+    "tslib": "^1.7.1"
+  },
+  "devDependencies": {
+    "@angular/cli": "^1.6.7",
+    "@angular/compiler-cli": "^5.0.0",
+    "@types/node": "~6.0.60",
+    "codelyzer": "~3.2.0",
+    "ng-packagr": "^2.0.0",
+    "protractor": "~5.1.2",
+    "ts-node": "~3.2.0",
+    "tslint": "~5.7.0",
+    "typescript": "~2.4.2"
+  },
+  "main": "bundles/differentiate.umd.js",
+  "module": "esm5/differentiate.js",
+  "es2015": "esm2015/differentiate.js",
+  "typings": "differentiate.d.ts",
+  "metadata": "differentiate.metadata.json"
+}
