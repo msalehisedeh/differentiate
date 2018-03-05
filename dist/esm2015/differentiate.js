@@ -274,20 +274,6 @@ class DifferentiateComponent {
             if (!rightItemInLeftSide) {
                 rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
             }
-            if (rightItemInLeftSide && rightItemInLeftSide.index !== j) {
-                while (j < rightSide.length) {
-                    rightItemInLeftSide = this.leftItemFromRightItem(leftSide[j], rightSide[j]);
-                    if (rightItemInLeftSide) {
-                        rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
-                        break;
-                    }
-                    else {
-                        this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
-                        j++;
-                        i++;
-                    }
-                }
-            }
             if (leftItemInRightSide && leftItemInRightSide.index !== i) {
                 while (i < leftSide.length) {
                     leftItemInRightSide = this.leftItemFromRightItem(rightSide[i], leftSide[i]);
@@ -302,13 +288,18 @@ class DifferentiateComponent {
                     }
                 }
             }
-            if (rightItemInLeftSide && j < rightSide.length) {
-                let /** @type {?} */ x = this.itemInArray(leftSide, rightSide[j]);
-                if (x && x.index !== rightItemInLeftSide.index) {
-                    this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
-                    j++;
-                    i++;
-                    rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
+            if (rightItemInLeftSide && rightItemInLeftSide.index !== j) {
+                while (j < rightSide.length) {
+                    rightItemInLeftSide = this.leftItemFromRightItem(leftSide[j], rightSide[j]);
+                    if (rightItemInLeftSide) {
+                        rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
+                        break;
+                    }
+                    else {
+                        this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+                        j++;
+                        i++;
+                    }
                 }
             }
             if (leftItemInRightSide && i < leftSide.length) {
@@ -320,12 +311,21 @@ class DifferentiateComponent {
                     leftItemInRightSide = j < rightSide.length ? rightSide[j] : undefined;
                 }
             }
+            if (rightItemInLeftSide && j < rightSide.length) {
+                let /** @type {?} */ x = this.itemInArray(leftSide, rightSide[j]);
+                if (x && x.index !== rightItemInLeftSide.index) {
+                    this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+                    j++;
+                    i++;
+                    rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
+                }
+            }
             if (leftItemInRightSide && rightItemInLeftSide) {
                 this.compare(leftItemInRightSide, rightItemInLeftSide);
                 j++;
                 i++;
             }
-            looping = (i < leftSide.length && j < rightSide.length);
+            looping = (i < leftSide.length || j < rightSide.length);
         }
     }
     /**

@@ -41,4 +41,4 @@ In your App module
 	...
 
 Sample view of the component at work!
-![alt text](sample.png "What you would see when a comparison is performed")
+![alt text](https://raw.githubusercontent.com/msalehisedeh/differentiate/master/sample.png "What you would see when a comparison is performed")
