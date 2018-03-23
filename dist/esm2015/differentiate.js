@@ -386,11 +386,15 @@ class DifferentiateComponent {
      * @return {?}
      */
     onhover(event) {
+        let /** @type {?} */ children;
         if (event.side == 'left-side') {
-            this.rightSide[0].children[event.index].hover = event.hover;
+            children = this.rightSide[0].children;
         }
         else {
-            this.leftSide[0].children[event.index].hover = event.hover;
+            children = this.leftSide[0].children;
+        }
+        if (children.length > event.index) {
+            children[event.index].hover = event.hover;
         }
     }
 }

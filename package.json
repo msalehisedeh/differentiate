@@ -1,6 +1,6 @@
 {
   "name": "differentiate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -11,21 +11,21 @@
   },
   "private": false,
   "dependencies": {
-    "@angular/common": "^5.0.0",
-    "@angular/compiler": "^5.0.0",
-    "@angular/core": "^5.0.0",
+    "@angular/common": "^5.0.0 || ^4.0.0 || ^2.0.0",
+    "@angular/compiler": "^5.0.0 || ^4.0.0 || ^2.0.0",
+    "@angular/core": "^5.0.0 || ^4.0.0 || ^2.0.0",
     "core-js": "^2.4.1",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
     "@angular/cli": "^1.6.7",
-    "@angular/compiler-cli": "^5.0.0",
-    "@types/node": "~6.0.60",
-    "codelyzer": "~3.2.0",
+    "@angular/compiler-cli": "^5.0.0 || ^4.0.0 || ^2.0.0",
+    "@types/node": "^6.0.60",
+    "codelyzer": "^3.2.0",
     "ng-packagr": "^2.0.0",
-    "protractor": "~5.1.2",
-    "ts-node": "~3.2.0",
-    "tslint": "~5.7.0",
-    "typescript": "~2.4.2"
+    "protractor": "^5.1.2",
+    "ts-node": "^3.2.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.4.2"
   }
 }
