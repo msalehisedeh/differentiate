@@ -1,6 +1,6 @@
 {
   "name": "differentiate",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -10,6 +10,19 @@
     "packagr": "ng-packagr -p ng-package.json"
   },
   "private": false,
+  "keywords": [
+    "angular 4",
+    "diff",
+    "differ",
+    "difference",
+    "compare",
+    "comparison",
+    "visual",
+    "pretty",
+    "lightweight",
+    "easy",
+    "best"
+  ],
   "dependencies": {
     "@angular/common": "^5.0.0 || ^4.0.0 || ^2.0.0",
     "@angular/compiler": "^5.0.0 || ^4.0.0 || ^2.0.0",

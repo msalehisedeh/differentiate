@@ -3,8 +3,17 @@
 Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to see any change on either objects on the fly as the change occurs?
 Would you like to know how it can be done? Take a look at the demo and enjoy the ride...
 
-[Live Demo](https://diffrenciate.stackblitz.io)
-[Source code](https://github.com/msalehisedeh/differentiate)
+[Live Demo](https://diffrenciate.stackblitz.io) | [Source code](https://github.com/msalehisedeh/differentiate)
+
+# Version 0.0.6
+```
+MODULE:
+  DifferentiateModule
+
+EXPORTS:
+  DifferentiateComponent
+  DifferentiateTree
+```
 
 ## So... How it can be done?
 
