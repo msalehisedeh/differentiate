@@ -3,18 +3,18 @@
 Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to clearly see what is changed on either objects on the fly while they change?
 Would you like to know how it can be done? Would you like to have it done without writing code for it? Take a look at the demo and enjoy the ride...
 
-Differentiate is an Angular based code and will interpreat changes deep in JSON heirarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
+Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
 
 [Live Demo](https://diffrenciate.stackblitz.io) | [Source code](https://github.com/msalehisedeh/differentiate/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
 
 
-## Attributes (LockTableComponent)
+## Attributes
 | Attribute                |Description                                         |
 |--------------------------|----------------------------------------------------|
-|leftSideObject            |JSON Object on lefthand side to be differentiated.  |
-|rightSideObject           |JSON Object on righthand side to be differentiated. |
-|onlyShowDifferences       |If set, will ignore all attributes in JSON heigherarchy which are not changed. |
-|attributeOrderIsImportant |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object heigherarchy. |
+|leftSideObject            |JSON Object on left-hand side to be differentiated.  |
+|rightSideObject           |JSON Object on right-hand side to be differentiated. |
+|onlyShowDifferences       |If set, will ignore all attributes in JSON hierarchy which are not changed. |
+|attributeOrderIsImportant |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy. |
 
 
 # Version 1.1.0
@@ -74,6 +74,6 @@ Include the **DifferentiateModule** module in your App module.
 
 It is that simple..!!
 
-Sample view of the component at work! (You can create drop-downs and JSON log views to manipulate the **diffrentiate** component...)
+Sample view of the component at work! (You can create drop-downs and JSON log views to manipulate the **differentiate** component...)
 ![alt text](https://raw.githubusercontent.com/msalehisedeh/differentiate/master/sample.png "What you would see when a comparison is performed")
 
