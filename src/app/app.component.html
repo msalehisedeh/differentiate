@@ -4,6 +4,55 @@
     Welcome to {{ title }}!
   </h1>
 </div>
+
+<button (click)="sampleJson = undefined;displayEntry = true">Add new JSON in dropdown</button>
+<div id="entry" *ngIf="displayEntry">
+  <div class="heading"><a (click)="displayEntry = false;">X</a></div>
+  
+  <div class="info" *ngIf="!error">Please select a name for your data set it to be added in dropdown. And drop in data and transformation.</div>
+  <div class="alert" *ngIf="error" [textContent]="error"></div>
+  <label for="entryName">Name: <input id="entryName" #entryName /></label>
+  <label for="entryJson" class="wide">
+    Data JSON: 
+    <textarea #sampler
+      id="entryJson" 
+      cols="40" 
+      rows="10" 
+      (keyup)="keyup($event)"
+      (paste)="onDataPaste($event, sampler.value)" 
+      [textContent]="sampleJson | json"></textarea>
+  </label>
+  <button (click)="addDataEntry(entryName.value)" *ngIf="!pointsOfEntry || pointOfEntry">
+  Submit
+</button>
+</div>
+
+<fieldset class="pick-points">
+  <legend>Options:</legend>
+  <label for="option1">
+      <input 
+          type="checkbox" 
+          name="option1" 
+          id="option1" 
+          [value]="attributeOrderIsImportant" 
+          [checked]="attributeOrderIsImportant ? true: null" 
+          (keyup)="keyup($event)"
+          (click)="click($event, 'attributeOrderIsImportant')" /> 
+      <span>Attribute Order Is Important</span>
+  </label>   
+  <label for="option2">
+      <input 
+          type="checkbox" 
+          name="option2" 
+          id="option2" 
+          [value]="onlyShowDifferences" 
+          [checked]="onlyShowDifferences ? true: null" 
+          (keyup)="keyup($event)"
+          (click)="click($event, 'onlyShowDifferences')" /> 
+      <span>Only Show Differences</span>
+  </label>   
+</fieldset>
+
 <div class="selection-wrapper">
   <select (change)="leftSideSelection($event)">
     <option *ngFor="let option of options" 
@@ -19,6 +68,8 @@
   </select>
 </div>
 <differentiate 
+    [onlyShowDifferences]="onlyShowDifferences"
+    [attributeOrderIsImportant]="attributeOrderIsImportant"
     [leftSideObject]="lefttree" 
     [rightSideObject]="righttree"></differentiate>
     

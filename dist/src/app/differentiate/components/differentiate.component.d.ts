@@ -2,6 +2,8 @@ import { OnInit, OnChanges } from '@angular/core';
 export declare class DifferentiateComponent implements OnInit, OnChanges {
     leftSide: any;
     rightSide: any;
+    attributeOrderIsImportant: boolean;
+    onlyShowDifferences: boolean;
     leftSideObject: any;
     rightSideObject: any;
     constructor();
@@ -12,8 +14,10 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     private compare(leftNode, rightNode);
     private reIndex(list);
     private copyInto(side, item, index, status);
+    private setChildrenStatus(list, status);
     private unify(leftSide, rightSide);
     private toInternalStruction(leftNode, rightNode);
+    private filterUnchanged(list);
     ngOnChanges(changes: any): void;
     ngOnInit(): void;
     onhover(event: any): void;

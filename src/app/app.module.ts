@@ -9,7 +9,7 @@ import { DifferentiateModule } from './differentiate/differentiate.module';
     AppComponent
   ],
   imports: [
-	CommonModule,
+    CommonModule,
     DifferentiateModule
   ],
   providers: [

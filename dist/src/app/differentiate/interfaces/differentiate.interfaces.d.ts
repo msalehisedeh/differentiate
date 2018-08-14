@@ -16,6 +16,7 @@ export interface DifferentiateNode {
     id: number;
     index: number;
     name: string;
+    altName: string;
     value: string;
     parent: DifferentiateNodeType;
     type: DifferentiateNodeType;

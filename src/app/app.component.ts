@@ -7,6 +7,10 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Differentiate Objects';
+  onlyShowDifferences = false;
+  attributeOrderIsImportant = true;
+  displayEntry = false;
+  error = undefined;
   save = false;
   counter = 1;
   selectedIndex = 0;
@@ -14,6 +18,8 @@ export class AppComponent {
   selectedRight;
   lefttree;
   righttree;
+  sampleJson: any;
+  sample: any;
   samplers = {
     "Sample One": {
           occupation: "engineer",
@@ -22,7 +28,7 @@ export class AppComponent {
           address: {
             street: "2345 blagio dr",
             city: "Los Angeles",
-            contries: ["US","BS","CS"]
+            countries: ["US","BS","CS"]
           },
           data: [
             [
@@ -37,7 +43,12 @@ export class AppComponent {
           address: {
             street: "2345 blagio dr",
             city: "Los Angeles",
-            contries: ["US","CS"]
+            countries: ["US","CS"]
+          },
+          extraCondition: {
+            street: "2345 blagio dr",
+            city: "Los Angeles",
+            countries: ["US","CS"]
           },
           methaData: [
             [
@@ -52,7 +63,7 @@ export class AppComponent {
           address: {
             street: "2345 blagio dr",
             city: "Los Angeles",
-            contries: ["US","CS"]
+            countries: ["US","CS"]
           },
           methaData: [
             [
@@ -80,4 +91,59 @@ export class AppComponent {
     this.selectedRight = this.options[event.target.selectedIndex];
     this.righttree = this.samplers[this.selectedRight];
   }
+
+  private toJson(text, message){
+    let json;
+    try {
+      json = eval(text);
+      this.error = undefined;
+    }catch(e){
+      this.error = message + " :: " + e.message;
+      json = undefined;
+    }
+    return json
+  }
+
+  keyup(event) {
+    this.sampleJson = event.target.value;
+    this.transformToJSON();
+  }
+  click(event, attr) {
+    if (attr === 'attributeOrderIsImportant') {
+      this.attributeOrderIsImportant = event.target.checked;
+    }
+    if (attr === 'onlyShowDifferences') {
+      this.onlyShowDifferences = event.target.checked;
+    }
+  }
+  addDataEntry(entryName) {
+    if (entryName.length) {
+      if (this.sample) {
+        this.samplers[entryName] = this.sample;
+        this.options = Object.keys(this.samplers);
+        this.displayEntry = false;
+      }
+    } else {
+      this.error = "Please enter JSON data and a name for it to be in the dropdown!";
+    }
+  }
+
+  transformToJSON() {
+    this.error = undefined;
+    this.sample = this.toJson(this.sampleJson, "We are unable to validate JSON data. Please clear text and try again!");
+  }
+
+  onDataPaste(event: any, sampler) {
+    this.sampleJson = sampler + event.clipboardData.getData('text/plain');
+    this.transformToJSON();
+    if (this.sample) {
+      const target = event.target;
+      target.blur();
+      setTimeout(() => {
+        console.log(target, this.sampleJson)
+        target.value = this.sampleJson
+      },2)
+    }
+  }
+
 }

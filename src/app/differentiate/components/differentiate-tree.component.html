@@ -26,8 +26,8 @@
         (onhover)="bubleup($event)"
         [class.child-node]="child.parent != 4" 
         [children]='child.children'></differentiate-tree>
-    <div class="upper" *ngIf="child.status > 2"></div>
-    <div class="lower" *ngIf="child.status > 2"></div>
+    <div class="upper" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>
+    <div class="lower" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>
   </li>
 </ul>
 

@@ -1,6 +1,6 @@
 {
   "name": "differentiate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -13,10 +13,16 @@
   "keywords": [
 	"angular 4",
 	"diff",
+	"JSON",
 	"differ",
 	"difference",
 	"compare",
+	"compare JSON",
+	"compare Objects",
 	"comparison",
+	"Object comparison",
+	"JSON comparison",
+	"nifty",
 	"visual",
 	"pretty",
 	"lightweight",

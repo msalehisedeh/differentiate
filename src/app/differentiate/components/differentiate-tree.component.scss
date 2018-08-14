@@ -46,9 +46,6 @@ ul {
           font-style: italic;
         }
         .upper {
-          border: 1px solid #4a4;
-          border-top-width: 0;
-          border-left-width: 0;
           border-radius: 0 0 100% 0;
           box-sizing: border-box;
           height: 50%;
@@ -57,11 +54,34 @@ ul {
           width: 50%;
           top: 0;
           right: 0;
+
+          &.depth-1 {
+            border: 2px solid #285828;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #3f9c3f;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #57d657;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #57d657;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #57d657;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
         }
         .lower {
-          border: 1px solid #4a4;
-          border-bottom-width: 0;
-          border-left-width: 0;
           border-radius: 0 100% 0 0;
           box-sizing: border-box;
           height: 50%;
@@ -70,6 +90,32 @@ ul {
           width: 50%;
           bottom: 0;
           right: 0;
+          
+          &.depth-1 {
+            border: 2px solid #2c612c;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #3f9c3f;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #57d657;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #57d657;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #57d657;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
         }
       }
       &.removed {   
@@ -206,9 +252,6 @@ ul {
           text-decoration-color:  #ff0600;
         }
         .upper {
-          border: 1px solid #f00;
-          border-top-width: 0;
-          border-right-width: 0;
           border-radius: 0 0 0 100%;
           box-sizing: border-box;
           height: 50%;
@@ -216,11 +259,34 @@ ul {
           position: absolute;
           pointer-events:none;
           top: 0;
+
+          &.depth-1 {
+            border: 2px solid #700000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #ca0303;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #f00;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #f00;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #f00;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
         }
         .lower {
-          border: 1px solid #f00;
-          border-bottom-width: 0;
-          border-right-width: 0;
           border-radius: 100% 0 0 0;
           box-sizing: border-box;
           height: 50%;
@@ -228,6 +294,32 @@ ul {
           position: absolute;
           pointer-events:none;
           bottom: 0;
+
+          &.depth-1 {
+            border: 2px solid #700000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #ca0303;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #f00;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #f00;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #f00;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
         }
       }
       &.type-changed {

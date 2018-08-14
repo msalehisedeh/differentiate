@@ -39,6 +39,8 @@ DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = "removed";
  */
 var DifferentiateComponent = (function () {
     function DifferentiateComponent() {
+        this.attributeOrderIsImportant = true;
+        this.onlyShowDifferences = false;
     }
     /**
      * @return {?}
@@ -60,10 +62,18 @@ var DifferentiateComponent = (function () {
             node.map(function (item, i) {
                 var /** @type {?} */ jsonValue = _this.transformNodeToInternalStruction(item);
                 if (jsonValue instanceof Array) {
+                    if (!_this.attributeOrderIsImportant) {
+                        jsonValue.sort(function (a, b) { return a.name <= b.name ? -1 : 1; });
+                        jsonValue.map(function (x, i) {
+                            x.index = i;
+                            x.altName = "" + i;
+                        });
+                    }
                     children_1.push({
                         id: _this.generateNodeId(),
                         index: i,
                         name: "",
+                        altName: "" + i,
                         value: "",
                         parent: DifferentiateNodeType.array,
                         type: DifferentiateNodeType.array,
@@ -76,6 +86,7 @@ var DifferentiateComponent = (function () {
                         id: _this.generateNodeId(),
                         index: i,
                         name: "",
+                        altName: "" + i,
                         value: jsonValue,
                         parent: DifferentiateNodeType.array,
                         type: DifferentiateNodeType.literal,
@@ -89,13 +100,24 @@ var DifferentiateComponent = (function () {
         else if (node instanceof Object) {
             var /** @type {?} */ list = Object.keys(node);
             var /** @type {?} */ children_2 = [];
+            if (!this.attributeOrderIsImportant) {
+                list.sort(function (a, b) { return a <= b ? -1 : 1; });
+            }
             list.map(function (item, i) {
                 var /** @type {?} */ jsonValue = _this.transformNodeToInternalStruction(node[item]);
                 if (jsonValue instanceof Array) {
+                    if (!_this.attributeOrderIsImportant) {
+                        jsonValue.sort(function (a, b) { return a.name <= b.name ? -1 : 1; });
+                        jsonValue.map(function (x, i) {
+                            x.index = i;
+                            x.altName = "" + i;
+                        });
+                    }
                     children_2.push({
                         id: _this.generateNodeId(),
                         index: i,
                         name: item,
+                        altName: "" + i,
                         value: "",
                         parent: DifferentiateNodeType.json,
                         type: DifferentiateNodeType.array,
@@ -108,6 +130,7 @@ var DifferentiateComponent = (function () {
                         id: _this.generateNodeId(),
                         index: i,
                         name: item,
+                        altName: "" + i,
                         value: jsonValue,
                         parent: DifferentiateNodeType.json,
                         type: DifferentiateNodeType.pair,
@@ -129,10 +152,17 @@ var DifferentiateComponent = (function () {
         var /** @type {?} */ result;
         var /** @type {?} */ key = node.type === DifferentiateNodeType.literal ?
             node.value.toUpperCase() :
-            node.name;
+            node.type === DifferentiateNodeType.array ?
+                node.altName :
+                node.name;
         side.map(function (item) {
             if (item.type === DifferentiateNodeType.literal) {
                 if (item.value.toUpperCase() === key) {
+                    result = item;
+                }
+            }
+            else if (item.type === DifferentiateNodeType.array) {
+                if (item.altName === key) {
                     result = item;
                 }
             }
@@ -156,9 +186,16 @@ var DifferentiateComponent = (function () {
         }
         var /** @type {?} */ key = rightNode.type === DifferentiateNodeType.literal ?
             rightNode.value.toUpperCase() :
-            rightNode.name;
+            rightNode.type === DifferentiateNodeType.array ?
+                rightNode.altName :
+                rightNode.name;
         if (leftNode.type === DifferentiateNodeType.literal) {
             if (leftNode.value.toUpperCase() === key) {
+                result = leftNode;
+            }
+        }
+        else if (leftNode.type === DifferentiateNodeType.array) {
+            if (leftNode.altName === key) {
                 result = leftNode;
             }
         }
@@ -229,6 +266,20 @@ var DifferentiateComponent = (function () {
         this.reIndex(side);
         item.status = status;
         newItem.status = status;
+        this.setChildrenStatus(item.children, status);
+        this.setChildrenStatus(newItem.children, status);
+    };
+    /**
+     * @param {?} list
+     * @param {?} status
+     * @return {?}
+     */
+    DifferentiateComponent.prototype.setChildrenStatus = function (list, status) {
+        var _this = this;
+        list.map(function (x) {
+            x.status = status;
+            _this.setChildrenStatus(x.children, status);
+        });
     };
     /**
      * @param {?} leftSide
@@ -339,6 +390,30 @@ var DifferentiateComponent = (function () {
             rightSide: this.transformNodeToInternalStruction(rightNode)
         };
         this.unify(result.leftSide, result.rightSide);
+        if (this.onlyShowDifferences) {
+            result.leftSide = this.filterUnchanged(result.leftSide);
+            result.rightSide = this.filterUnchanged(result.rightSide);
+        }
+        return result;
+    };
+    /**
+     * @param {?} list
+     * @return {?}
+     */
+    DifferentiateComponent.prototype.filterUnchanged = function (list) {
+        var _this = this;
+        var /** @type {?} */ result = [];
+        list.map(function (item) {
+            item.children = _this.filterUnchanged(item.children);
+            if ((item.type === DifferentiateNodeType.array && item.children.length) ||
+                item.status !== DifferentiateNodeStatus.default) {
+                result.push(item);
+            }
+        });
+        result.map(function (x, i) {
+            x.index = i;
+            x.altName = "" + i;
+        });
         return result;
     };
     /**
@@ -346,6 +421,12 @@ var DifferentiateComponent = (function () {
      * @return {?}
      */
     DifferentiateComponent.prototype.ngOnChanges = function (changes) {
+        if (changes.attributeOrderIsImportant) {
+            this.ngOnInit();
+        }
+        if (changes.onlyShowDifferences) {
+            this.ngOnInit();
+        }
         if (changes.leftSideObject) {
             this.ngOnInit();
         }
@@ -409,6 +490,8 @@ DifferentiateComponent.decorators = [
 /** @nocollapse */
 DifferentiateComponent.ctorParameters = function () { return []; };
 DifferentiateComponent.propDecorators = {
+    "attributeOrderIsImportant": [{ type: Input, args: ["attributeOrderIsImportant",] },],
+    "onlyShowDifferences": [{ type: Input, args: ["onlyShowDifferences",] },],
     "leftSideObject": [{ type: Input, args: ["leftSideObject",] },],
     "rightSideObject": [{ type: Input, args: ["rightSideObject",] },],
 };
@@ -454,8 +537,8 @@ var DifferentiateTree = (function () {
 DifferentiateTree.decorators = [
     { type: Component, args: [{
                 selector: 'differentiate-tree',
-                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\"\n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\"\n    [class.removed]=\"child.status === 6\"\n    [class.type-changed]=\"child.status === 2\"\n    [class.name-changed]=\"child.status === 3\"\n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name'\n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value'\n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\"\n        [level]=\"depth+1\"\n        (onhover)=\"bubleup($event)\"\n        [class.child-node]=\"child.parent != 4\"\n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n",
-                styles: [":host{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:inline-block;\n  width:100%; }\n:host.root{\n  float:left;\n  width:50%; }\n:host.child-node{\n  float:left; }\nul{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  list-style:none;\n  padding:0;\n  width:100%; }\n  ul li .hover{\n    background-color:#ddd; }\n  ul.undefined li:hover{\n    background-color:#ddd; }\n  ul.left-side{\n    border-right:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.left-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.left-side li.added .name, ul.left-side li.added .value{\n        opacity:0.2;\n        font-style:italic; }\n      ul.left-side li.added .upper{\n        border:1px solid #4a4;\n        border-top-width:0;\n        border-left-width:0;\n        border-radius:0 0 100% 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        top:0;\n        right:0; }\n      ul.left-side li.added .lower{\n        border:1px solid #4a4;\n        border-bottom-width:0;\n        border-left-width:0;\n        border-radius:0 100% 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        bottom:0;\n        right:0; }\n      ul.left-side li.removed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.removed .upper:after{\n          content:' - ';\n          color:#f00;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.removed .lower{\n        display:none; }\n      ul.left-side li.removed .tree-node span{\n        color:#f00; }\n      ul.left-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.left-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.name-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.left-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:66px;\n        top:0;\n        right:0; }\n        ul.left-side li.value-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul.right-side{\n    border-left:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.right-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.right-side li.added .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:90%;\n        top:0;\n        left:0; }\n        ul.right-side li.added .upper:after{\n          content:'+';\n          color:#4a4;\n          font-weight:bold;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.added .lower{\n        display:none; }\n      ul.right-side li.added .tree-node span{\n        color:#4a4; }\n      ul.right-side li.removed .name, ul.right-side li.removed .value{\n        -webkit-text-decoration-line:line-through;\n                text-decoration-line:line-through;\n        -webkit-text-decoration-color:#ff0600;\n                text-decoration-color:#ff0600; }\n      ul.right-side li.removed .upper{\n        border:1px solid #f00;\n        border-top-width:0;\n        border-right-width:0;\n        border-radius:0 0 0 100%;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        top:0; }\n      ul.right-side li.removed .lower{\n        border:1px solid #f00;\n        border-bottom-width:0;\n        border-right-width:0;\n        border-radius:100% 0 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        bottom:0; }\n      ul.right-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.right-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.name-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.right-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.value-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul .tree-node{\n    -webkit-box-sizing:border-box;\n            box-sizing:border-box;\n    color:#7c9eb2;\n    display:table;\n    padding:0;\n    position:relative;\n    margin:0;\n    width:100%; }\n    ul .tree-node.depth-0{\n      padding-left:5px; }\n    ul .tree-node.depth-1{\n      padding-left:20px; }\n    ul .tree-node.depth-2{\n      padding-left:40px; }\n    ul .tree-node.depth-3{\n      padding-left:60px; }\n    ul .tree-node.depth-4{\n      padding-left:80px; }\n    ul .tree-node.depth-5{\n      padding-left:100px; }\n    ul .tree-node.depth-6{\n      padding-left:120px; }\n    ul .tree-node.depth-7{\n      padding-left:140px; }\n    ul .tree-node.depth-8{\n      padding-left:160px; }\n    ul .tree-node.depth-9{\n      padding-left:180px; }\n    ul .tree-node.depth-10{\n      padding-left:200px; }\n    ul .tree-node .name{\n      color:#444;\n      font-weight:bold; }\n      ul .tree-node .name:after{\n        content:':'; }\n    ul .tree-node .value.string:before{\n      content:'\"'; }\n    ul .tree-node .value.string:after{\n      content:'\"'; }\n"],
+                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\"\n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\"\n    [class.removed]=\"child.status === 6\"\n    [class.type-changed]=\"child.status === 2\"\n    [class.name-changed]=\"child.status === 3\"\n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name'\n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value'\n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\"\n        [level]=\"depth+1\"\n        (onhover)=\"bubleup($event)\"\n        [class.child-node]=\"child.parent != 4\"\n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n",
+                styles: [":host{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:inline-block;\n  width:100%; }\n:host.root{\n  float:left;\n  width:50%; }\n:host.child-node{\n  float:left; }\nul{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  list-style:none;\n  padding:0;\n  width:100%; }\n  ul li .hover{\n    background-color:#ddd; }\n  ul.undefined li:hover{\n    background-color:#ddd; }\n  ul.left-side{\n    border-right:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.left-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.left-side li.added .name, ul.left-side li.added .value{\n        opacity:0.2;\n        font-style:italic; }\n      ul.left-side li.added .upper{\n        border-radius:0 0 100% 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        top:0;\n        right:0; }\n        ul.left-side li.added .upper.depth-1{\n          border:2px solid #285828;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-2{\n          border:2px dotted #3f9c3f;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-3{\n          border:1px solid #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-4{\n          border:1px dotted #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-5{\n          border:1px dashed #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n      ul.left-side li.added .lower{\n        border-radius:0 100% 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        bottom:0;\n        right:0; }\n        ul.left-side li.added .lower.depth-1{\n          border:2px solid #2c612c;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-2{\n          border:2px dotted #3f9c3f;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-3{\n          border:1px solid #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-4{\n          border:1px dotted #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-5{\n          border:1px dashed #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n      ul.left-side li.removed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.removed .upper:after{\n          content:' - ';\n          color:#f00;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.removed .lower{\n        display:none; }\n      ul.left-side li.removed .tree-node span{\n        color:#f00; }\n      ul.left-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.left-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.name-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.left-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:66px;\n        top:0;\n        right:0; }\n        ul.left-side li.value-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul.right-side{\n    border-left:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.right-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.right-side li.added .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:90%;\n        top:0;\n        left:0; }\n        ul.right-side li.added .upper:after{\n          content:'+';\n          color:#4a4;\n          font-weight:bold;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.added .lower{\n        display:none; }\n      ul.right-side li.added .tree-node span{\n        color:#4a4; }\n      ul.right-side li.removed .name, ul.right-side li.removed .value{\n        -webkit-text-decoration-line:line-through;\n                text-decoration-line:line-through;\n        -webkit-text-decoration-color:#ff0600;\n                text-decoration-color:#ff0600; }\n      ul.right-side li.removed .upper{\n        border-radius:0 0 0 100%;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        top:0; }\n        ul.right-side li.removed .upper.depth-1{\n          border:2px solid #700000;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-2{\n          border:2px dotted #ca0303;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-3{\n          border:1px solid #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-4{\n          border:1px dotted #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-5{\n          border:1px dashed #f00;\n          border-top-width:0;\n          border-right-width:0; }\n      ul.right-side li.removed .lower{\n        border-radius:100% 0 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        bottom:0; }\n        ul.right-side li.removed .lower.depth-1{\n          border:2px solid #700000;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-2{\n          border:2px dotted #ca0303;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-3{\n          border:1px solid #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-4{\n          border:1px dotted #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-5{\n          border:1px dashed #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n      ul.right-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.right-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.name-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.right-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.value-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul .tree-node{\n    -webkit-box-sizing:border-box;\n            box-sizing:border-box;\n    color:#7c9eb2;\n    display:table;\n    padding:0;\n    position:relative;\n    margin:0;\n    width:100%; }\n    ul .tree-node.depth-0{\n      padding-left:5px; }\n    ul .tree-node.depth-1{\n      padding-left:20px; }\n    ul .tree-node.depth-2{\n      padding-left:40px; }\n    ul .tree-node.depth-3{\n      padding-left:60px; }\n    ul .tree-node.depth-4{\n      padding-left:80px; }\n    ul .tree-node.depth-5{\n      padding-left:100px; }\n    ul .tree-node.depth-6{\n      padding-left:120px; }\n    ul .tree-node.depth-7{\n      padding-left:140px; }\n    ul .tree-node.depth-8{\n      padding-left:160px; }\n    ul .tree-node.depth-9{\n      padding-left:180px; }\n    ul .tree-node.depth-10{\n      padding-left:200px; }\n    ul .tree-node .name{\n      color:#444;\n      font-weight:bold; }\n      ul .tree-node .name:after{\n        content:':'; }\n    ul .tree-node .value.string:before{\n      content:'\"'; }\n    ul .tree-node .value.string:after{\n      content:'\"'; }\n"],
             },] },
 ];
 /** @nocollapse */
