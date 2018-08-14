@@ -60,6 +60,7 @@ class DifferentiateComponent {
         let /** @type {?} */ result = node;
         if (node instanceof Array) {
             const /** @type {?} */ children = [];
+            const /** @type {?} */ p = DifferentiateNodeType.array;
             node.map((item, i) => {
                 const /** @type {?} */ jsonValue = this.transformNodeToInternalStruction(item);
                 if (jsonValue instanceof Array) {
@@ -76,7 +77,7 @@ class DifferentiateComponent {
                         name: "",
                         altName: "" + i,
                         value: "",
-                        parent: DifferentiateNodeType.array,
+                        parent: p,
                         type: DifferentiateNodeType.array,
                         status: DifferentiateNodeStatus.default,
                         children: jsonValue
@@ -89,7 +90,7 @@ class DifferentiateComponent {
                         name: "",
                         altName: "" + i,
                         value: jsonValue,
-                        parent: DifferentiateNodeType.array,
+                        parent: p,
                         type: DifferentiateNodeType.literal,
                         status: DifferentiateNodeStatus.default,
                         children: []
@@ -101,6 +102,7 @@ class DifferentiateComponent {
         else if (node instanceof Object) {
             const /** @type {?} */ list = Object.keys(node);
             const /** @type {?} */ children = [];
+            const /** @type {?} */ p = DifferentiateNodeType.json;
             if (!this.attributeOrderIsImportant) {
                 list.sort((a, b) => { return a <= b ? -1 : 1; });
             }
@@ -120,8 +122,8 @@ class DifferentiateComponent {
                         name: item,
                         altName: "" + i,
                         value: "",
-                        parent: DifferentiateNodeType.json,
-                        type: DifferentiateNodeType.array,
+                        parent: p,
+                        type: DifferentiateNodeType.json,
                         status: DifferentiateNodeStatus.default,
                         children: jsonValue
                     });
@@ -133,7 +135,7 @@ class DifferentiateComponent {
                         name: item,
                         altName: "" + i,
                         value: jsonValue,
-                        parent: DifferentiateNodeType.json,
+                        parent: p,
                         type: DifferentiateNodeType.pair,
                         status: DifferentiateNodeStatus.default,
                         children: []
@@ -238,9 +240,7 @@ class DifferentiateComponent {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
             }
-            else {
-                this.unify(leftNode.children, rightNode.children);
-            }
+            this.unify(leftNode.children, rightNode.children);
         }
     }
     /**
@@ -371,7 +371,13 @@ class DifferentiateComponent {
                 }
             }
             if (leftItemInRightSide && rightItemInLeftSide) {
-                this.compare(leftItemInRightSide, rightItemInLeftSide);
+                if (leftItemInRightSide.parent !== rightItemInLeftSide.parent) {
+                    this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+                    this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+                }
+                else {
+                    this.compare(leftItemInRightSide, rightItemInLeftSide);
+                }
                 j++;
                 i++;
             }
@@ -403,7 +409,7 @@ class DifferentiateComponent {
         const /** @type {?} */ result = [];
         list.map((item) => {
             item.children = this.filterUnchanged(item.children);
-            if ((item.type === DifferentiateNodeType.array && item.children.length) ||
+            if ((item.type > DifferentiateNodeType.pair && item.children.length) ||
                 item.status !== DifferentiateNodeStatus.default) {
                 result.push(item);
             }

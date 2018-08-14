@@ -49,6 +49,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     let result = node;
     if (node instanceof Array) {
       const children: DifferentiateNode[] = [];
+      const p = DifferentiateNodeType.array;
       node.map( (item, i) => {
         const jsonValue: any = this.transformNodeToInternalStruction(item);
         if (jsonValue instanceof Array) {
@@ -65,7 +66,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             name: "",
             altName: "" + i,
             value: "",
-            parent: DifferentiateNodeType.array,
+            parent: p,
             type: DifferentiateNodeType.array,
             status: DifferentiateNodeStatus.default,
             children: jsonValue
@@ -77,7 +78,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             name: "",
             altName: "" + i,
             value: jsonValue,
-            parent: DifferentiateNodeType.array,
+            parent: p,
             type: DifferentiateNodeType.literal,
             status: DifferentiateNodeStatus.default,
             children: []
@@ -88,6 +89,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     } else if (node instanceof Object) {
       const list = Object.keys(node);
       const children: DifferentiateNode[] = [];
+      const p = DifferentiateNodeType.json;
       if (!this.attributeOrderIsImportant) {
         list.sort((a,b) => {return a <= b ? -1: 1});
       }
@@ -107,8 +109,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             name: item,
             altName: "" + i,
             value: "",
-            parent: DifferentiateNodeType.json,
-            type: DifferentiateNodeType.array,
+            parent: p,
+            type: DifferentiateNodeType.json,
             status: DifferentiateNodeStatus.default,
             children: jsonValue
           });
@@ -119,7 +121,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             name: item,
             altName: "" + i,
             value: jsonValue,
-            parent: DifferentiateNodeType.json,
+            parent: p,
             type: DifferentiateNodeType.pair,
             status: DifferentiateNodeStatus.default,
             children: []
@@ -206,9 +208,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       if (leftNode.name !== rightNode.name) {
         leftNode.status = DifferentiateNodeStatus.nameChanged;
         rightNode.status = DifferentiateNodeStatus.nameChanged;
-      } else {
-        this.unify(leftNode.children, rightNode.children);
       }
+      this.unify(leftNode.children, rightNode.children);
     }
   }
   private reIndex(list: DifferentiateNode[]) {
@@ -313,7 +314,12 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         }
       }
       if (leftItemInRightSide && rightItemInLeftSide) {
-        this.compare(leftItemInRightSide, rightItemInLeftSide);
+        if (leftItemInRightSide.parent !== rightItemInLeftSide.parent) {
+          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+        } else {
+          this.compare(leftItemInRightSide, rightItemInLeftSide);
+        }
         j++;i++;
       }
       looping = (i < leftSide.length || j < rightSide.length);
@@ -338,7 +344,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     
     list.map( (item) => {
       item.children = this.filterUnchanged(item.children);
-      if ((item.type === DifferentiateNodeType.array && item.children.length) ||
+      if ((item.type > DifferentiateNodeType.pair && item.children.length) ||
           item.status !== DifferentiateNodeStatus.default) {
         result.push(item);
       }

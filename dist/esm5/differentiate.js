@@ -59,6 +59,7 @@ var DifferentiateComponent = (function () {
         var /** @type {?} */ result = node;
         if (node instanceof Array) {
             var /** @type {?} */ children_1 = [];
+            var /** @type {?} */ p_1 = DifferentiateNodeType.array;
             node.map(function (item, i) {
                 var /** @type {?} */ jsonValue = _this.transformNodeToInternalStruction(item);
                 if (jsonValue instanceof Array) {
@@ -75,7 +76,7 @@ var DifferentiateComponent = (function () {
                         name: "",
                         altName: "" + i,
                         value: "",
-                        parent: DifferentiateNodeType.array,
+                        parent: p_1,
                         type: DifferentiateNodeType.array,
                         status: DifferentiateNodeStatus.default,
                         children: jsonValue
@@ -88,7 +89,7 @@ var DifferentiateComponent = (function () {
                         name: "",
                         altName: "" + i,
                         value: jsonValue,
-                        parent: DifferentiateNodeType.array,
+                        parent: p_1,
                         type: DifferentiateNodeType.literal,
                         status: DifferentiateNodeStatus.default,
                         children: []
@@ -100,6 +101,7 @@ var DifferentiateComponent = (function () {
         else if (node instanceof Object) {
             var /** @type {?} */ list = Object.keys(node);
             var /** @type {?} */ children_2 = [];
+            var /** @type {?} */ p_2 = DifferentiateNodeType.json;
             if (!this.attributeOrderIsImportant) {
                 list.sort(function (a, b) { return a <= b ? -1 : 1; });
             }
@@ -119,8 +121,8 @@ var DifferentiateComponent = (function () {
                         name: item,
                         altName: "" + i,
                         value: "",
-                        parent: DifferentiateNodeType.json,
-                        type: DifferentiateNodeType.array,
+                        parent: p_2,
+                        type: DifferentiateNodeType.json,
                         status: DifferentiateNodeStatus.default,
                         children: jsonValue
                     });
@@ -132,7 +134,7 @@ var DifferentiateComponent = (function () {
                         name: item,
                         altName: "" + i,
                         value: jsonValue,
-                        parent: DifferentiateNodeType.json,
+                        parent: p_2,
                         type: DifferentiateNodeType.pair,
                         status: DifferentiateNodeStatus.default,
                         children: []
@@ -237,9 +239,7 @@ var DifferentiateComponent = (function () {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
             }
-            else {
-                this.unify(leftNode.children, rightNode.children);
-            }
+            this.unify(leftNode.children, rightNode.children);
         }
     };
     /**
@@ -372,7 +372,13 @@ var DifferentiateComponent = (function () {
                 }
             }
             if (leftItemInRightSide && rightItemInLeftSide) {
-                this.compare(leftItemInRightSide, rightItemInLeftSide);
+                if (leftItemInRightSide.parent !== rightItemInLeftSide.parent) {
+                    this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+                    this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+                }
+                else {
+                    this.compare(leftItemInRightSide, rightItemInLeftSide);
+                }
                 j++;
                 i++;
             }
@@ -405,7 +411,7 @@ var DifferentiateComponent = (function () {
         var /** @type {?} */ result = [];
         list.map(function (item) {
             item.children = _this.filterUnchanged(item.children);
-            if ((item.type === DifferentiateNodeType.array && item.children.length) ||
+            if ((item.type > DifferentiateNodeType.pair && item.children.length) ||
                 item.status !== DifferentiateNodeStatus.default) {
                 result.push(item);
             }
