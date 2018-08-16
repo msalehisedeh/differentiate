@@ -5,7 +5,8 @@ Would you like to know how it can be done? Would you like to have it done withou
 
 Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
 
-**NOTE:** Version 1.5.0 is the latest version compatible with Angular 2, 4, or 5.
+**NOTE:** Version 1.5.0 is the latest version compatible with Angular 2+, 4++, or 5+.
+**NOTE:** Version 2.0.0 is the first version compatible with Angular 6+.
 
 
 [Live Demo](https://diffrenciate.stackblitz.io) | [Source code](https://github.com/msalehisedeh/differentiate/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
@@ -25,6 +26,10 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |----------------------|------------------------------------------------|
 |onrevert              |Will be fired when any one of changed items on right hand-side should be reverted back to mimic item on left hand-side.    |
 
+
+# Version 2.0.0
+updated dependencies (no code change) to work with Angular 6 which will not fit within Angular 5, 4, or 2 because of a change made by angular folks.
+If your project is not an Angular 6+ project, please update your package.json file and remove "^" to make sure you are not accidentally upgrading to 2.0.0 and above versions of differentiate.
 
 # Version 1.5.0
 Added ability to revert any changed attribute/value of JSON on right hand-side to become same as attribute/value on left hand-side. 

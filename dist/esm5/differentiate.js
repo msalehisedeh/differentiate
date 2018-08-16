@@ -1,21 +1,16 @@
 import { Component, Input, Output, EventEmitter, NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-/** @enum {number} */
+
 var DifferentiateNodeType = {
     literal: 1,
     pair: 2,
     json: 3,
     array: 4,
 };
-DifferentiateNodeType[DifferentiateNodeType.literal] = "literal";
-DifferentiateNodeType[DifferentiateNodeType.pair] = "pair";
-DifferentiateNodeType[DifferentiateNodeType.json] = "json";
-DifferentiateNodeType[DifferentiateNodeType.array] = "array";
-/** @enum {number} */
+DifferentiateNodeType[DifferentiateNodeType.literal] = 'literal';
+DifferentiateNodeType[DifferentiateNodeType.pair] = 'pair';
+DifferentiateNodeType[DifferentiateNodeType.json] = 'json';
+DifferentiateNodeType[DifferentiateNodeType.array] = 'array';
 var DifferentiateNodeStatus = {
     default: 1,
     typeChanged: 2,
@@ -24,43 +19,28 @@ var DifferentiateNodeStatus = {
     added: 5,
     removed: 6,
 };
-DifferentiateNodeStatus[DifferentiateNodeStatus.default] = "default";
-DifferentiateNodeStatus[DifferentiateNodeStatus.typeChanged] = "typeChanged";
-DifferentiateNodeStatus[DifferentiateNodeStatus.nameChanged] = "nameChanged";
-DifferentiateNodeStatus[DifferentiateNodeStatus.valueChanged] = "valueChanged";
-DifferentiateNodeStatus[DifferentiateNodeStatus.added] = "added";
-DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = "removed";
-/**
- * @record
- */
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-var DifferentiateComponent = (function () {
+DifferentiateNodeStatus[DifferentiateNodeStatus.default] = 'default';
+DifferentiateNodeStatus[DifferentiateNodeStatus.typeChanged] = 'typeChanged';
+DifferentiateNodeStatus[DifferentiateNodeStatus.nameChanged] = 'nameChanged';
+DifferentiateNodeStatus[DifferentiateNodeStatus.valueChanged] = 'valueChanged';
+DifferentiateNodeStatus[DifferentiateNodeStatus.added] = 'added';
+DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = 'removed';
+var DifferentiateComponent = /** @class */ (function () {
     function DifferentiateComponent() {
         this.allowRevert = false;
         this.attributeOrderIsImportant = true;
         this.onlyShowDifferences = false;
         this.onrevert = new EventEmitter();
     }
-    /**
-     * @return {?}
-     */
     DifferentiateComponent.prototype.generateNodeId = function () {
-        var /** @type {?} */ min = 1;
-        var /** @type {?} */ max = 10000;
+        var min = 1;
+        var max = 10000;
         return Math.floor(Math.random() * (max - min + 1)) + min;
     };
-    /**
-     * @param {?} node
-     * @param {?} parent
-     * @return {?}
-     */
     DifferentiateComponent.prototype.transformNodeToOriginalStructure = function (node, parent) {
         var _this = this;
-        var /** @type {?} */ json = {};
-        var /** @type {?} */ array = [];
+        var json = {};
+        var array = [];
         node.map(function (item) {
             if (parent === DifferentiateNodeType.json) {
                 if (item.type === DifferentiateNodeType.literal) {
@@ -70,7 +50,7 @@ var DifferentiateComponent = (function () {
                     json[item.name] = item.value;
                 }
                 else if (item.type === DifferentiateNodeType.array) {
-                    var /** @type {?} */ x = _this.transformNodeToOriginalStructure(item.children, item.parent);
+                    var x = _this.transformNodeToOriginalStructure(item.children, item.parent);
                     if (item.name.length) {
                         json[item.name] = x;
                     }
@@ -96,18 +76,14 @@ var DifferentiateComponent = (function () {
         });
         return array.length ? array : json;
     };
-    /**
-     * @param {?} node
-     * @return {?}
-     */
     DifferentiateComponent.prototype.transformNodeToInternalStruction = function (node) {
         var _this = this;
-        var /** @type {?} */ result = node;
+        var result = node;
         if (node instanceof Array) {
-            var /** @type {?} */ children_1 = [];
-            var /** @type {?} */ p_1 = DifferentiateNodeType.array;
+            var children_1 = [];
+            var p_1 = DifferentiateNodeType.array;
             node.map(function (item, i) {
-                var /** @type {?} */ jsonValue = _this.transformNodeToInternalStruction(item);
+                var jsonValue = _this.transformNodeToInternalStruction(item);
                 if (jsonValue instanceof Array) {
                     if (!_this.attributeOrderIsImportant) {
                         jsonValue.sort(function (a, b) { return a.name <= b.name ? -1 : 1; });
@@ -145,14 +121,14 @@ var DifferentiateComponent = (function () {
             result = children_1;
         }
         else if (node instanceof Object) {
-            var /** @type {?} */ list = Object.keys(node);
-            var /** @type {?} */ children_2 = [];
-            var /** @type {?} */ p_2 = DifferentiateNodeType.json;
+            var list = Object.keys(node);
+            var children_2 = [];
+            var p_2 = DifferentiateNodeType.json;
             if (!this.attributeOrderIsImportant) {
                 list.sort(function (a, b) { return a <= b ? -1 : 1; });
             }
             list.map(function (item, i) {
-                var /** @type {?} */ jsonValue = _this.transformNodeToInternalStruction(node[item]);
+                var jsonValue = _this.transformNodeToInternalStruction(node[item]);
                 if (jsonValue instanceof Array) {
                     if (!_this.attributeOrderIsImportant) {
                         jsonValue.sort(function (a, b) { return a.name <= b.name ? -1 : 1; });
@@ -191,14 +167,9 @@ var DifferentiateComponent = (function () {
         }
         return result;
     };
-    /**
-     * @param {?} side
-     * @param {?} node
-     * @return {?}
-     */
     DifferentiateComponent.prototype.itemInArray = function (side, node) {
-        var /** @type {?} */ result;
-        var /** @type {?} */ key = node.type === DifferentiateNodeType.literal ?
+        var result;
+        var key = node.type === DifferentiateNodeType.literal ?
             node.value.toUpperCase() :
             node.type === DifferentiateNodeType.array ?
                 node.altName :
@@ -222,17 +193,12 @@ var DifferentiateComponent = (function () {
         });
         return result;
     };
-    /**
-     * @param {?} leftNode
-     * @param {?} rightNode
-     * @return {?}
-     */
     DifferentiateComponent.prototype.leftItemFromRightItem = function (leftNode, rightNode) {
-        var /** @type {?} */ result;
+        var result;
         if (!leftNode || !rightNode) {
             return result;
         }
-        var /** @type {?} */ key = rightNode.type === DifferentiateNodeType.literal ?
+        var key = rightNode.type === DifferentiateNodeType.literal ?
             rightNode.value.toUpperCase() :
             rightNode.type === DifferentiateNodeType.array ?
                 rightNode.altName :
@@ -254,11 +220,6 @@ var DifferentiateComponent = (function () {
         }
         return result;
     };
-    /**
-     * @param {?} leftNode
-     * @param {?} rightNode
-     * @return {?}
-     */
     DifferentiateComponent.prototype.compare = function (leftNode, rightNode) {
         if (leftNode.type !== rightNode.type) {
             leftNode.status = DifferentiateNodeStatus.typeChanged;
@@ -298,10 +259,6 @@ var DifferentiateComponent = (function () {
             this.unify(leftNode.children, rightNode.children);
         }
     };
-    /**
-     * @param {?} list
-     * @return {?}
-     */
     DifferentiateComponent.prototype.reIndex = function (list) {
         var _this = this;
         list.map(function (item, i) {
@@ -309,15 +266,8 @@ var DifferentiateComponent = (function () {
             _this.reIndex(item.children);
         });
     };
-    /**
-     * @param {?} side
-     * @param {?} item
-     * @param {?} index
-     * @param {?} status
-     * @return {?}
-     */
     DifferentiateComponent.prototype.copyInto = function (side, item, index, status) {
-        var /** @type {?} */ newItem = JSON.parse(JSON.stringify(item));
+        var newItem = JSON.parse(JSON.stringify(item));
         side.splice(index, 0, newItem);
         this.reIndex(side);
         item.status = status;
@@ -327,11 +277,6 @@ var DifferentiateComponent = (function () {
         this.setChildrenStatus(item.children, status);
         this.setChildrenStatus(newItem.children, status);
     };
-    /**
-     * @param {?} list
-     * @param {?} status
-     * @return {?}
-     */
     DifferentiateComponent.prototype.setChildrenStatus = function (list, status) {
         var _this = this;
         list.map(function (x) {
@@ -339,16 +284,13 @@ var DifferentiateComponent = (function () {
             _this.setChildrenStatus(x.children, status);
         });
     };
-    /**
-     * @param {?} leftSide
-     * @param {?} rightSide
-     * @return {?}
-     */
     DifferentiateComponent.prototype.unify = function (leftSide, rightSide) {
-        var /** @type {?} */ i = 0, /** @type {?} */ j = 0, /** @type {?} */ looping = true;
+        var i = 0;
+        var j = 0;
+        var looping = true;
         while (looping) {
-            var /** @type {?} */ leftItemInRightSide = i < leftSide.length ? this.itemInArray(rightSide, leftSide[i]) : undefined;
-            var /** @type {?} */ rightItemInLeftSide = j < rightSide.length ? this.itemInArray(leftSide, rightSide[j]) : undefined;
+            var leftItemInRightSide = i < leftSide.length ? this.itemInArray(rightSide, leftSide[i]) : undefined;
+            var rightItemInLeftSide = j < rightSide.length ? this.itemInArray(leftSide, rightSide[j]) : undefined;
             if (!leftItemInRightSide && i < leftSide.length) {
                 if (!rightSide.length) {
                     while (i < leftSide.length) {
@@ -412,7 +354,7 @@ var DifferentiateComponent = (function () {
                 }
             }
             if (leftItemInRightSide && i < leftSide.length) {
-                var /** @type {?} */ x = this.itemInArray(rightSide, leftSide[i]);
+                var x = this.itemInArray(rightSide, leftSide[i]);
                 if (x && x.index !== leftItemInRightSide.index) {
                     this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
                     j++;
@@ -421,7 +363,7 @@ var DifferentiateComponent = (function () {
                 }
             }
             if (rightItemInLeftSide && j < rightSide.length) {
-                var /** @type {?} */ x = this.itemInArray(leftSide, rightSide[j]);
+                var x = this.itemInArray(leftSide, rightSide[j]);
                 if (x && x.index !== rightItemInLeftSide.index) {
                     this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
                     j++;
@@ -443,13 +385,8 @@ var DifferentiateComponent = (function () {
             looping = (i < leftSide.length || j < rightSide.length);
         }
     };
-    /**
-     * @param {?} leftNode
-     * @param {?} rightNode
-     * @return {?}
-     */
     DifferentiateComponent.prototype.toInternalStruction = function (leftNode, rightNode) {
-        var /** @type {?} */ result = {
+        var result = {
             leftSide: this.transformNodeToInternalStruction(leftNode),
             rightSide: this.transformNodeToInternalStruction(rightNode)
         };
@@ -460,13 +397,9 @@ var DifferentiateComponent = (function () {
         }
         return result;
     };
-    /**
-     * @param {?} list
-     * @return {?}
-     */
     DifferentiateComponent.prototype.filterUnchanged = function (list) {
         var _this = this;
-        var /** @type {?} */ result = [];
+        var result = [];
         list.map(function (item) {
             item.children = _this.filterUnchanged(item.children);
             if ((item.type > DifferentiateNodeType.pair && item.children.length) ||
@@ -480,10 +413,6 @@ var DifferentiateComponent = (function () {
         });
         return result;
     };
-    /**
-     * @param {?} changes
-     * @return {?}
-     */
     DifferentiateComponent.prototype.ngOnChanges = function (changes) {
         if (changes.attributeOrderIsImportant) {
             this.ngOnInit();
@@ -498,12 +427,9 @@ var DifferentiateComponent = (function () {
             this.ngOnInit();
         }
     };
-    /**
-     * @return {?}
-     */
     DifferentiateComponent.prototype.ngOnInit = function () {
         if (this.leftSideObject && this.rightSideObject) {
-            var /** @type {?} */ comparision = this.toInternalStruction(this.leftSideObject, this.rightSideObject);
+            var comparision = this.toInternalStruction(this.leftSideObject, this.rightSideObject);
             this.leftSide = [{
                     id: this.generateNodeId(),
                     name: "",
@@ -526,14 +452,9 @@ var DifferentiateComponent = (function () {
                 }];
         }
     };
-    /**
-     * @param {?} side
-     * @param {?} id
-     * @return {?}
-     */
     DifferentiateComponent.prototype.lookupChildOf = function (side, id) {
         var _this = this;
-        var /** @type {?} */ foundItem = undefined;
+        var foundItem = undefined;
         if (side.children.length) {
             side.children.map(function (item) {
                 if (!foundItem) {
@@ -552,13 +473,9 @@ var DifferentiateComponent = (function () {
         }
         return foundItem;
     };
-    /**
-     * @param {?} event
-     * @return {?}
-     */
     DifferentiateComponent.prototype.revert = function (event) {
-        var /** @type {?} */ leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
-        var /** @type {?} */ rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
+        var leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
+        var rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
         if (event.status === DifferentiateNodeStatus.added) {
             leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
             rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
@@ -594,12 +511,8 @@ var DifferentiateComponent = (function () {
         }
         this.onrevert.emit(this.transformNodeToOriginalStructure(this.rightSide[0].children, DifferentiateNodeType.json));
     };
-    /**
-     * @param {?} event
-     * @return {?}
-     */
     DifferentiateComponent.prototype.onhover = function (event) {
-        var /** @type {?} */ children;
+        var children;
         if (event.side == 'left-side') {
             children = this.rightSide[0].children;
         }
@@ -615,25 +528,20 @@ var DifferentiateComponent = (function () {
 DifferentiateComponent.decorators = [
     { type: Component, args: [{
                 selector: 'differentiate',
-                template: "<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"left-side\"\n    (onhover)=\"onhover($event)\"\n    [children]=\"leftSide\"></differentiate-tree>\n<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"right-side\"\n    [showActionButton]=\"allowRevert\"\n    (onhover)=\"onhover($event)\"\n    (onrevert)=\"revert($event)\"\n    [children]=\"rightSide\"></differentiate-tree>\n",
-                styles: [":host{\n  border:1px solid #444;\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:block;\n  max-width:100vw;\n  max-height:300px;\n  overflow-y:auto;\n  position:relative;\n  width:100%; }\n"],
+                template: "<differentiate-tree \n    class=\"root\" \n    level=\"0\" \n    side=\"left-side\" \n    (onhover)=\"onhover($event)\"\n    [children]=\"leftSide\"></differentiate-tree>\n<differentiate-tree \n    class=\"root\" \n    level=\"0\" \n    side=\"right-side\" \n    [showActionButton]=\"allowRevert\" \n    (onhover)=\"onhover($event)\"\n    (onrevert)=\"revert($event)\"\n    [children]=\"rightSide\"></differentiate-tree>\n\n",
+                styles: [":host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;overflow-y:auto;position:relative;width:100%}"],
             },] },
 ];
-/** @nocollapse */
 DifferentiateComponent.ctorParameters = function () { return []; };
 DifferentiateComponent.propDecorators = {
-    "allowRevert": [{ type: Input, args: ["allowRevert",] },],
-    "attributeOrderIsImportant": [{ type: Input, args: ["attributeOrderIsImportant",] },],
-    "onlyShowDifferences": [{ type: Input, args: ["onlyShowDifferences",] },],
-    "leftSideObject": [{ type: Input, args: ["leftSideObject",] },],
-    "rightSideObject": [{ type: Input, args: ["rightSideObject",] },],
-    "onrevert": [{ type: Output, args: ["onrevert",] },],
+    allowRevert: [{ type: Input, args: ["allowRevert",] }],
+    attributeOrderIsImportant: [{ type: Input, args: ["attributeOrderIsImportant",] }],
+    onlyShowDifferences: [{ type: Input, args: ["onlyShowDifferences",] }],
+    leftSideObject: [{ type: Input, args: ["leftSideObject",] }],
+    rightSideObject: [{ type: Input, args: ["rightSideObject",] }],
+    onrevert: [{ type: Output, args: ["onrevert",] }]
 };
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-var DifferentiateTree = (function () {
+var DifferentiateTree = /** @class */ (function () {
     function DifferentiateTree() {
         this.showActionButton = false;
         this.status = 1;
@@ -641,50 +549,25 @@ var DifferentiateTree = (function () {
         this.onhover = new EventEmitter();
         this.onrevert = new EventEmitter();
     }
-    /**
-     * @return {?}
-     */
     DifferentiateTree.prototype.ngOnInit = function () {
         this.depth = parseInt(this.level);
     };
-    /**
-     * @param {?} event
-     * @return {?}
-     */
     DifferentiateTree.prototype.bubleup = function (event) {
         event.side = this.side;
         this.onhover.emit(event);
     };
-    /**
-     * @param {?} event
-     * @return {?}
-     */
     DifferentiateTree.prototype.keyup = function (event) {
-        var /** @type {?} */ code = event.which;
+        var code = event.which;
         if (code === 13) {
             event.target.click();
         }
     };
-    /**
-     * @param {?} child
-     * @return {?}
-     */
     DifferentiateTree.prototype.undo = function (child) {
         this.onrevert.emit(child);
     };
-    /**
-     * @param {?} event
-     * @return {?}
-     */
     DifferentiateTree.prototype.revert = function (event) {
-        // bubble up the undo event.
         this.onrevert.emit(event);
     };
-    /**
-     * @param {?} flag
-     * @param {?} i
-     * @return {?}
-     */
     DifferentiateTree.prototype.mouseOvered = function (flag, i) {
         if (this.depth === 1) {
             this.onhover.emit({
@@ -699,26 +582,20 @@ var DifferentiateTree = (function () {
 DifferentiateTree.decorators = [
     { type: Component, args: [{
                 selector: 'differentiate-tree',
-                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\"\n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\"\n    [class.removed]=\"child.status === 6\"\n    [class.type-changed]=\"child.status === 2\"\n    [class.name-changed]=\"child.status === 3\"\n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name'\n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value'\n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n      <span title=\"Undo\"\n        class=\"undo\"\n        tabindex=\"0\"\n        aria-hidden=\"true\"\n        (keyup)=\"keyup($event)\"\n        (click)=\"undo(child)\"\n        *ngIf=\"showActionButton && status !== child.status && child.status > 1\">&#x238c;</span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\"\n        [level]=\"depth+1\"\n        [status]=\"child.status\"\n        [showActionButton]=\"showActionButton\"\n        (onhover)=\"bubleup($event)\"\n        (onrevert)=\"revert($event)\"\n        [class.child-node]=\"child.parent != 4\"\n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n",
-                styles: [":host{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:inline-block;\n  width:100%; }\n:host.root{\n  float:left;\n  width:50%; }\n:host.child-node{\n  float:left; }\nul{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  list-style:none;\n  padding:0;\n  width:100%; }\n  ul li .hover{\n    background-color:#ddd; }\n  ul li .tree-node{\n    position:relative; }\n    ul li .tree-node .undo{\n      position:absolute;\n      width:18px;\n      height:18px;\n      right:0;\n      margin:0 5px 0 0;\n      cursor:pointer;\n      font-weight:bold;\n      font-size:1.2rem;\n      color:#9e2525; }\n  ul.undefined li:hover{\n    background-color:#ddd; }\n  ul.left-side{\n    border-right:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.left-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.left-side li.added .name, ul.left-side li.added .value{\n        opacity:0.2;\n        font-style:italic; }\n      ul.left-side li.added .upper{\n        border-radius:0 0 100% 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        top:0;\n        right:0; }\n        ul.left-side li.added .upper.depth-1{\n          border:2px solid #285828;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-2{\n          border:2px dotted #3f9c3f;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-3{\n          border:1px solid #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-4{\n          border:1px dotted #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-5{\n          border:1px dashed #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n      ul.left-side li.added .lower{\n        border-radius:0 100% 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        bottom:0;\n        right:0; }\n        ul.left-side li.added .lower.depth-1{\n          border:2px solid #2c612c;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-2{\n          border:2px dotted #3f9c3f;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-3{\n          border:1px solid #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-4{\n          border:1px dotted #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-5{\n          border:1px dashed #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n      ul.left-side li.removed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.removed .upper:after{\n          content:' - ';\n          color:#f00;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.removed .lower{\n        display:none; }\n      ul.left-side li.removed .tree-node span{\n        color:#f00; }\n      ul.left-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.left-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.name-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.left-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:66px;\n        top:0;\n        right:0; }\n        ul.left-side li.value-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul.right-side{\n    border-left:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.right-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.right-side li.added .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:90%;\n        top:0;\n        left:0; }\n        ul.right-side li.added .upper:after{\n          content:'+';\n          color:#4a4;\n          font-weight:bold;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.added .lower{\n        display:none; }\n      ul.right-side li.added .tree-node span{\n        color:#4a4; }\n      ul.right-side li.removed .name, ul.right-side li.removed .value{\n        -webkit-text-decoration-line:line-through;\n                text-decoration-line:line-through;\n        -webkit-text-decoration-color:#ff0600;\n                text-decoration-color:#ff0600; }\n      ul.right-side li.removed .upper{\n        border-radius:0 0 0 100%;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        top:0; }\n        ul.right-side li.removed .upper.depth-1{\n          border:2px solid #700000;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-2{\n          border:2px dotted #ca0303;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-3{\n          border:1px solid #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-4{\n          border:1px dotted #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-5{\n          border:1px dashed #f00;\n          border-top-width:0;\n          border-right-width:0; }\n      ul.right-side li.removed .lower{\n        border-radius:100% 0 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        bottom:0; }\n        ul.right-side li.removed .lower.depth-1{\n          border:2px solid #700000;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-2{\n          border:2px dotted #ca0303;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-3{\n          border:1px solid #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-4{\n          border:1px dotted #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-5{\n          border:1px dashed #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n      ul.right-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.right-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.name-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.right-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.value-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul .tree-node{\n    -webkit-box-sizing:border-box;\n            box-sizing:border-box;\n    color:#7c9eb2;\n    display:table;\n    padding:0;\n    position:relative;\n    margin:0;\n    width:100%; }\n    ul .tree-node.depth-0{\n      padding-left:5px; }\n    ul .tree-node.depth-1{\n      padding-left:20px; }\n    ul .tree-node.depth-2{\n      padding-left:40px; }\n    ul .tree-node.depth-3{\n      padding-left:60px; }\n    ul .tree-node.depth-4{\n      padding-left:80px; }\n    ul .tree-node.depth-5{\n      padding-left:100px; }\n    ul .tree-node.depth-6{\n      padding-left:120px; }\n    ul .tree-node.depth-7{\n      padding-left:140px; }\n    ul .tree-node.depth-8{\n      padding-left:160px; }\n    ul .tree-node.depth-9{\n      padding-left:180px; }\n    ul .tree-node.depth-10{\n      padding-left:200px; }\n    ul .tree-node .name{\n      color:#444;\n      font-weight:bold; }\n      ul .tree-node .name:after{\n        content:':'; }\n    ul .tree-node .value.string:before{\n      content:'\"'; }\n    ul .tree-node .value.string:after{\n      content:'\"'; }\n"],
+                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\" \n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\" \n    [class.removed]=\"child.status === 6\" \n    [class.type-changed]=\"child.status === 2\" \n    [class.name-changed]=\"child.status === 3\" \n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name' \n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value' \n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n      <span title=\"Undo\"\n        class=\"undo\" \n        tabindex=\"0\"\n        aria-hidden=\"true\"\n        (keyup)=\"keyup($event)\"\n        (click)=\"undo(child)\"\n        *ngIf=\"showActionButton && status !== child.status && child.status > 1\">&#x238c;</span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\" \n        [level]=\"depth+1\" \n        [status]=\"child.status\" \n        [showActionButton]=\"showActionButton\" \n        (onhover)=\"bubleup($event)\"\n        (onrevert)=\"revert($event)\"\n        [class.child-node]=\"child.parent != 4\" \n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n\n",
+                styles: [":host{-webkit-box-sizing:border-box;box-sizing:border-box;display:inline-block;width:100%}:host.root{float:left;width:50%}:host.child-node{float:left}ul{-webkit-box-sizing:border-box;box-sizing:border-box;list-style:none;padding:0;width:100%}ul li .hover{background-color:#ddd}ul li .tree-node{position:relative}ul li .tree-node .undo{position:absolute;width:18px;height:18px;right:0;margin:0 5px 0 0;cursor:pointer;font-weight:700;font-size:1.2rem;color:#9e2525}ul.undefined li:hover{background-color:#ddd}ul.left-side{border-right:1px solid #444;display:inline-block;margin:0}ul.left-side li{position:relative;display:table;width:100%}ul.left-side li.added .name,ul.left-side li.added .value{opacity:.2;font-style:italic}ul.left-side li.added .upper{border-radius:0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;top:0;right:0}ul.left-side li.added .upper.depth-1{border:2px solid #285828;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-2{border:2px dotted #3f9c3f;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-3{border:1px solid #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-4{border:1px dotted #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-5{border:1px dashed #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .lower{border-radius:0 100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;bottom:0;right:0}ul.left-side li.added .lower.depth-1{border:2px solid #2c612c;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-2{border:2px dotted #3f9c3f;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-3{border:1px solid #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-4{border:1px dotted #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-5{border:1px dashed #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.removed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.removed .upper:after{content:' - ';color:red;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.removed .lower{display:none}ul.left-side li.removed .tree-node span,ul.left-side li.type-changed .tree-node span{color:red}ul.left-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.name-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.name-changed .tree-node .name{color:#00f}ul.left-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:66px;top:0;right:0}ul.left-side li.value-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.value-changed .tree-node .value{color:#00f}ul.right-side{border-left:1px solid #444;display:inline-block;margin:0}ul.right-side li{position:relative;display:table;width:100%}ul.right-side li.added .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:90%;top:0;left:0}ul.right-side li.added .upper:after{content:'+';color:#4a4;font-weight:700;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.added .lower{display:none}ul.right-side li.added .tree-node span{color:#4a4}ul.right-side li.removed .name,ul.right-side li.removed .value{-webkit-text-decoration-line:line-through;text-decoration-line:line-through;-webkit-text-decoration-color:#ff0600;text-decoration-color:#ff0600}ul.right-side li.removed .upper{border-radius:0 0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;top:0}ul.right-side li.removed .upper.depth-1{border:2px solid #700000;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-2{border:2px dotted #ca0303;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-3{border:1px solid red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-4{border:1px dotted red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-5{border:1px dashed red;border-top-width:0;border-right-width:0}ul.right-side li.removed .lower{border-radius:100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;bottom:0}ul.right-side li.removed .lower.depth-1{border:2px solid #700000;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-2{border:2px dotted #ca0303;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-3{border:1px solid red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-4{border:1px dotted red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-5{border:1px dashed red;border-bottom-width:0;border-right-width:0}ul.right-side li.type-changed .tree-node span{color:red}ul.right-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.name-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.name-changed .tree-node .name{color:#00f}ul.right-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.value-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.value-changed .tree-node .value{color:#00f}ul .tree-node{-webkit-box-sizing:border-box;box-sizing:border-box;color:#7c9eb2;display:table;padding:0;position:relative;margin:0;width:100%}ul .tree-node.depth-0{padding-left:5px}ul .tree-node.depth-1{padding-left:20px}ul .tree-node.depth-2{padding-left:40px}ul .tree-node.depth-3{padding-left:60px}ul .tree-node.depth-4{padding-left:80px}ul .tree-node.depth-5{padding-left:100px}ul .tree-node.depth-6{padding-left:120px}ul .tree-node.depth-7{padding-left:140px}ul .tree-node.depth-8{padding-left:160px}ul .tree-node.depth-9{padding-left:180px}ul .tree-node.depth-10{padding-left:200px}ul .tree-node .name{color:#444;font-weight:700}ul .tree-node .name:after{content:':'}ul .tree-node .value.string:after,ul .tree-node .value.string:before{content:'\"'}"],
             },] },
 ];
-/** @nocollapse */
-DifferentiateTree.ctorParameters = function () { return []; };
 DifferentiateTree.propDecorators = {
-    "children": [{ type: Input, args: ["children",] },],
-    "showActionButton": [{ type: Input, args: ["showActionButton",] },],
-    "status": [{ type: Input, args: ["status",] },],
-    "side": [{ type: Input, args: ["side",] },],
-    "level": [{ type: Input, args: ["level",] },],
-    "onhover": [{ type: Output, args: ["onhover",] },],
-    "onrevert": [{ type: Output, args: ["onrevert",] },],
+    children: [{ type: Input, args: ["children",] }],
+    showActionButton: [{ type: Input, args: ["showActionButton",] }],
+    status: [{ type: Input, args: ["status",] }],
+    side: [{ type: Input, args: ["side",] }],
+    level: [{ type: Input, args: ["level",] }],
+    onhover: [{ type: Output, args: ["onhover",] }],
+    onrevert: [{ type: Output, args: ["onrevert",] }]
 };
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-var DifferentiateModule = (function () {
+var DifferentiateModule = /** @class */ (function () {
     function DifferentiateModule() {
     }
     return DifferentiateModule;
@@ -740,18 +617,6 @@ DifferentiateModule.decorators = [
                 schemas: [CUSTOM_ELEMENTS_SCHEMA]
             },] },
 ];
-/** @nocollapse */
-DifferentiateModule.ctorParameters = function () { return []; };
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes} checked by tsc
- */
-/**
- * Generated bundle index. Do not edit.
- */
+
 export { DifferentiateComponent, DifferentiateTree, DifferentiateModule };
 //# sourceMappingURL=differentiate.js.map
