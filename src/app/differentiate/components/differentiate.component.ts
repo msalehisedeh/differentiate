@@ -6,7 +6,9 @@ import {
   Component,
   OnInit,
   OnChanges,
-  Input
+  Input,
+  Output,
+  EventEmitter
 } from '@angular/core';
 
 import {
@@ -25,6 +27,9 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   leftSide;
   rightSide;
 
+  @Input("allowRevert")
+  allowRevert = false;
+
   @Input("attributeOrderIsImportant")
   attributeOrderIsImportant = true;
 
@@ -37,6 +42,9 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   @Input("rightSideObject")
   rightSideObject;
 
+  @Output("onrevert")
+  onrevert = new EventEmitter();
+
   constructor(	) {
 	  
   }
@@ -44,6 +52,38 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     const min = 1;
     const max = 10000
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  private transformNodeToOriginalStructure(node, parent) {
+    let json = {};
+    let array = [];
+
+    node.map( (item: DifferentiateNode) => {
+      if (parent === DifferentiateNodeType.json) {        
+        if (item.type === DifferentiateNodeType.literal) {
+          array.push(item.value);
+        } else if (item.type === DifferentiateNodeType.pair) {
+          json[item.name] = item.value;
+        } else if (item.type === DifferentiateNodeType.array) {
+          const x = this.transformNodeToOriginalStructure(item.children, item.parent);
+          if (item.name.length) {
+            json[item.name] = x;
+          } else {
+            json = [x];
+          }
+        } else if (item.type === DifferentiateNodeType.json) {
+          json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
+        }
+      } else if (parent === DifferentiateNodeType.array){
+        if (item.type === DifferentiateNodeType.literal) {
+          array.push(item.value);
+        } else if (item.type === DifferentiateNodeType.json) {
+          array.push(this.transformNodeToOriginalStructure(item, item.parent));
+        } else if (item.type === DifferentiateNodeType.array) {
+          array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+        }
+      }
+    });
+    return array.length ? array : json;
   }
   private transformNodeToInternalStruction(node) {
     let result = node;
@@ -190,24 +230,34 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     if (leftNode.type !== rightNode.type) {
       leftNode.status = DifferentiateNodeStatus.typeChanged;
       rightNode.status = DifferentiateNodeStatus.typeChanged;
+      leftNode.counterpart = rightNode.id;
+      rightNode.counterpart = leftNode.id;
     } else if (leftNode.type === DifferentiateNodeType.literal) {
       if (leftNode.value !== rightNode.value) {
-            leftNode.status = DifferentiateNodeStatus.valueChanged;
-            rightNode.status = DifferentiateNodeStatus.valueChanged;
+        leftNode.status = DifferentiateNodeStatus.valueChanged;
+        rightNode.status = DifferentiateNodeStatus.valueChanged;
+        leftNode.counterpart = rightNode.id;
+        rightNode.counterpart = leftNode.id;
       }
     } else if (leftNode.type === DifferentiateNodeType.pair) {
       if (leftNode.name !== rightNode.name) {
-            leftNode.status = DifferentiateNodeStatus.nameChanged;
-            rightNode.status = DifferentiateNodeStatus.nameChanged;
+        leftNode.status = DifferentiateNodeStatus.nameChanged;
+        rightNode.status = DifferentiateNodeStatus.nameChanged;
+        leftNode.counterpart = rightNode.id;
+        rightNode.counterpart = leftNode.id;
       }
       if (leftNode.value !== rightNode.value) {
-            leftNode.status = DifferentiateNodeStatus.valueChanged;
-            rightNode.status = DifferentiateNodeStatus.valueChanged;
+        leftNode.status = DifferentiateNodeStatus.valueChanged;
+        rightNode.status = DifferentiateNodeStatus.valueChanged;
+        leftNode.counterpart = rightNode.id;
+        rightNode.counterpart = leftNode.id;
       }
     } else {
       if (leftNode.name !== rightNode.name) {
         leftNode.status = DifferentiateNodeStatus.nameChanged;
         rightNode.status = DifferentiateNodeStatus.nameChanged;
+        leftNode.counterpart = rightNode.id;
+        rightNode.counterpart = leftNode.id;
       }
       this.unify(leftNode.children, rightNode.children);
     }
@@ -229,6 +279,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
 
     item.status = status;
     newItem.status = status;
+    item.counterpart = newItem.id;
+    newItem.counterpart = item.id;
     this.setChildrenStatus(item.children, status)
     this.setChildrenStatus(newItem.children, status)
   }
@@ -395,6 +447,64 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         children: comparision.rightSide
       }];
     }
+  }
+  private lookupChildOf(side, id) {
+    let foundItem = undefined;
+    if (side.children.length) {
+      side.children.map( (item) => {
+        if (!foundItem) {
+          foundItem = this.lookupChildOf(item, id);
+          if (foundItem && foundItem.parent === undefined) {
+            foundItem.parent = side;
+          } else if (item.id === id) {
+            foundItem = {parent: side, node: item};
+          }
+        }
+      });
+    } else if (side.id === id) {
+      foundItem = {parent: undefined, node: side};
+    }
+    return foundItem;
+  }
+  revert(event) {
+    let leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
+    let rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
+
+    if (event.status === DifferentiateNodeStatus.added) {
+      leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
+      rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
+      this.reIndex(leftSideInfo.parent.children);
+      this.reIndex(rightSideInfo.parent.children);
+    } else if (event.status === DifferentiateNodeStatus.removed) {
+      rightSideInfo.node.status = DifferentiateNodeStatus.default;
+      leftSideInfo.node.status = DifferentiateNodeStatus.default;
+      this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status)
+      this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status)
+    } else if (event.status === DifferentiateNodeStatus.nameChanged) {
+      rightSideInfo.node.name = leftSideInfo.node.name;
+      rightSideInfo.node.status = DifferentiateNodeStatus.default;
+      leftSideInfo.node.status = DifferentiateNodeStatus.default;
+      this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status)
+      this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status)
+    } else if (event.status === DifferentiateNodeStatus.valueChanged) {
+      rightSideInfo.node.value = leftSideInfo.node.value;
+      rightSideInfo.node.status = DifferentiateNodeStatus.default;
+      leftSideInfo.node.status = DifferentiateNodeStatus.default;
+      this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status)
+      this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status)
+    } else if (event.status === DifferentiateNodeStatus.typeChanged) {
+      rightSideInfo.node.type = leftSideInfo.node.type;
+      rightSideInfo.node.status = DifferentiateNodeStatus.default;
+      leftSideInfo.node.status = DifferentiateNodeStatus.default;
+      this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status)
+      rightSideInfo.node.children = leftSideInfo.node.children;
+    }
+    this.onrevert.emit(
+      this.transformNodeToOriginalStructure(
+        this.rightSide[0].children, 
+        DifferentiateNodeType.json
+      )
+    );
   }
   onhover(event) {
     let children;

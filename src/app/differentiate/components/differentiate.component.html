@@ -8,6 +8,8 @@
     class="root" 
     level="0" 
     side="right-side" 
+    [showActionButton]="allowRevert" 
     (onhover)="onhover($event)"
+    (onrevert)="revert($event)"
     [children]="rightSide"></differentiate-tree>
 

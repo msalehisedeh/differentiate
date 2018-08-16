@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Differentiate Objects';
+  actions=[];
   onlyShowDifferences = false;
   attributeOrderIsImportant = true;
   displayEntry = false;
@@ -20,56 +21,60 @@ export class AppComponent {
   righttree;
   sampleJson: any;
   sample: any;
+  expectedActions = ["fa fa-undo","fa fa-save"];
   samplers = {
     "Sample One": {
-          occupation: "engineer",
-          firstname: "masoud",
-          lastname: "salehi",
-          address: {
-            street: "2345 blagio dr",
-            city: "Los Angeles",
-            countries: ["US","BS","CS"]
-          },
-          data: [
-            [
-              "Better things yet to come!"
-            ]
-          ]
+      id: 1,
+      occupation: "engineer",
+      firstname: "masoud",
+      lastname: "salehi",
+      address: {
+        street: "2345 blagio dr",
+        city: "Los Angeles",
+        countries: ["US","BS","CS"]
+      },
+      data: [
+        [
+          "Better things yet to come!"
+        ]
+      ]
     },
     "Sample Two": {
-          firstname: "neeku",
-          lastname: "salehi",
-          age: 20,
-          address: {
-            street: "2345 blagio dr",
-            city: "Los Angeles",
-            countries: ["US","CS"]
-          },
-          extraCondition: {
-            street: "2345 blagio dr",
-            city: "Los Angeles",
-            countries: ["US","CS"]
-          },
-          methaData: [
-            [
-              "Better Things Yet to Come!"
-            ]
-          ]
+      id: 2,
+      firstname: "neeku",
+      lastname: "salehi",
+      age: 20,
+      address: {
+        street: "2345 blagio dr",
+        city: "Los Angeles",
+        countries: ["US","CS"]
+      },
+      extraCondition: {
+        street: "2345 blagio dr",
+        city: "Los Angeles",
+        countries: ["US","CS"]
+      },
+      methaData: [
+        [
+          "Better Things Yet to Come!"
+        ]
+      ]
     },
     "Sample Three": {
-          age: 20,
-          firstname: "neeku",
-          lastName: "salehi",
-          address: {
-            street: "2345 blagio dr",
-            city: "Los Angeles",
-            countries: ["US","CS"]
-          },
-          methaData: [
-            [
-              "Enjoy the visual comparision tool!"
-            ]
-          ]
+      id: 3,
+      age: 20,
+      firstname: "neeku",
+      lastName: "salehi",
+      address: {
+        street: "2345 blagio dr",
+        city: "Los Angeles",
+        countries: ["US","CS"]
+      },
+      methaData: [
+        [
+          "Enjoy the visual comparision tool!"
+        ]
+      ]
     },
     "Sample Four": {}
   }
@@ -145,5 +150,7 @@ export class AppComponent {
       },2)
     }
   }
-
+  revert(event) {
+    console.log(event);
+  }
 }

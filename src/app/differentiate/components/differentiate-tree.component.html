@@ -20,10 +20,20 @@
         [class.string]="depth > 0 && child.value && child.value.length"
         [innerHTML]="child.value ? child.value : '&nbsp;'">
       </span>
+      <span title="Undo"
+        class="undo" 
+        tabindex="0"
+        aria-hidden="true"
+        (keyup)="keyup($event)"
+        (click)="undo(child)"
+        *ngIf="showActionButton && status !== child.status && child.status > 1">&#x238c;</span>
     </div>
     <differentiate-tree *ngIf="child.children.length" 
         [level]="depth+1" 
+        [status]="child.status" 
+        [showActionButton]="showActionButton" 
         (onhover)="bubleup($event)"
+        (onrevert)="revert($event)"
         [class.child-node]="child.parent != 4" 
         [children]='child.children'></differentiate-tree>
     <div class="upper" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>

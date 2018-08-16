@@ -41,8 +41,10 @@ DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = "removed";
  */
 class DifferentiateComponent {
     constructor() {
+        this.allowRevert = false;
         this.attributeOrderIsImportant = true;
         this.onlyShowDifferences = false;
+        this.onrevert = new EventEmitter();
     }
     /**
      * @return {?}
@@ -51,6 +53,49 @@ class DifferentiateComponent {
         const /** @type {?} */ min = 1;
         const /** @type {?} */ max = 10000;
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    /**
+     * @param {?} node
+     * @param {?} parent
+     * @return {?}
+     */
+    transformNodeToOriginalStructure(node, parent) {
+        let /** @type {?} */ json = {};
+        let /** @type {?} */ array = [];
+        node.map((item) => {
+            if (parent === DifferentiateNodeType.json) {
+                if (item.type === DifferentiateNodeType.literal) {
+                    array.push(item.value);
+                }
+                else if (item.type === DifferentiateNodeType.pair) {
+                    json[item.name] = item.value;
+                }
+                else if (item.type === DifferentiateNodeType.array) {
+                    const /** @type {?} */ x = this.transformNodeToOriginalStructure(item.children, item.parent);
+                    if (item.name.length) {
+                        json[item.name] = x;
+                    }
+                    else {
+                        json = [x];
+                    }
+                }
+                else if (item.type === DifferentiateNodeType.json) {
+                    json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
+                }
+            }
+            else if (parent === DifferentiateNodeType.array) {
+                if (item.type === DifferentiateNodeType.literal) {
+                    array.push(item.value);
+                }
+                else if (item.type === DifferentiateNodeType.json) {
+                    array.push(this.transformNodeToOriginalStructure(item, item.parent));
+                }
+                else if (item.type === DifferentiateNodeType.array) {
+                    array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+                }
+            }
+        });
+        return array.length ? array : json;
     }
     /**
      * @param {?} node
@@ -218,27 +263,37 @@ class DifferentiateComponent {
         if (leftNode.type !== rightNode.type) {
             leftNode.status = DifferentiateNodeStatus.typeChanged;
             rightNode.status = DifferentiateNodeStatus.typeChanged;
+            leftNode.counterpart = rightNode.id;
+            rightNode.counterpart = leftNode.id;
         }
         else if (leftNode.type === DifferentiateNodeType.literal) {
             if (leftNode.value !== rightNode.value) {
                 leftNode.status = DifferentiateNodeStatus.valueChanged;
                 rightNode.status = DifferentiateNodeStatus.valueChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
         }
         else if (leftNode.type === DifferentiateNodeType.pair) {
             if (leftNode.name !== rightNode.name) {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
             if (leftNode.value !== rightNode.value) {
                 leftNode.status = DifferentiateNodeStatus.valueChanged;
                 rightNode.status = DifferentiateNodeStatus.valueChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
         }
         else {
             if (leftNode.name !== rightNode.name) {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
             this.unify(leftNode.children, rightNode.children);
         }
@@ -266,6 +321,8 @@ class DifferentiateComponent {
         this.reIndex(side);
         item.status = status;
         newItem.status = status;
+        item.counterpart = newItem.id;
+        newItem.counterpart = item.id;
         this.setChildrenStatus(item.children, status);
         this.setChildrenStatus(newItem.children, status);
     }
@@ -467,6 +524,73 @@ class DifferentiateComponent {
         }
     }
     /**
+     * @param {?} side
+     * @param {?} id
+     * @return {?}
+     */
+    lookupChildOf(side, id) {
+        let /** @type {?} */ foundItem = undefined;
+        if (side.children.length) {
+            side.children.map((item) => {
+                if (!foundItem) {
+                    foundItem = this.lookupChildOf(item, id);
+                    if (foundItem && foundItem.parent === undefined) {
+                        foundItem.parent = side;
+                    }
+                    else if (item.id === id) {
+                        foundItem = { parent: side, node: item };
+                    }
+                }
+            });
+        }
+        else if (side.id === id) {
+            foundItem = { parent: undefined, node: side };
+        }
+        return foundItem;
+    }
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    revert(event) {
+        let /** @type {?} */ leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
+        let /** @type {?} */ rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
+        if (event.status === DifferentiateNodeStatus.added) {
+            leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
+            rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
+            this.reIndex(leftSideInfo.parent.children);
+            this.reIndex(rightSideInfo.parent.children);
+        }
+        else if (event.status === DifferentiateNodeStatus.removed) {
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.nameChanged) {
+            rightSideInfo.node.name = leftSideInfo.node.name;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.valueChanged) {
+            rightSideInfo.node.value = leftSideInfo.node.value;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.typeChanged) {
+            rightSideInfo.node.type = leftSideInfo.node.type;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            rightSideInfo.node.children = leftSideInfo.node.children;
+        }
+        this.onrevert.emit(this.transformNodeToOriginalStructure(this.rightSide[0].children, DifferentiateNodeType.json));
+    }
+    /**
      * @param {?} event
      * @return {?}
      */
@@ -496,7 +620,9 @@ DifferentiateComponent.decorators = [
     class="root"
     level="0"
     side="right-side"
+    [showActionButton]="allowRevert"
     (onhover)="onhover($event)"
+    (onrevert)="revert($event)"
     [children]="rightSide"></differentiate-tree>
 `,
                 styles: [`:host{
@@ -515,10 +641,12 @@ DifferentiateComponent.decorators = [
 /** @nocollapse */
 DifferentiateComponent.ctorParameters = () => [];
 DifferentiateComponent.propDecorators = {
+    "allowRevert": [{ type: Input, args: ["allowRevert",] },],
     "attributeOrderIsImportant": [{ type: Input, args: ["attributeOrderIsImportant",] },],
     "onlyShowDifferences": [{ type: Input, args: ["onlyShowDifferences",] },],
     "leftSideObject": [{ type: Input, args: ["leftSideObject",] },],
     "rightSideObject": [{ type: Input, args: ["rightSideObject",] },],
+    "onrevert": [{ type: Output, args: ["onrevert",] },],
 };
 
 /**
@@ -527,8 +655,11 @@ DifferentiateComponent.propDecorators = {
  */
 class DifferentiateTree {
     constructor() {
-        this.onhover = new EventEmitter();
+        this.showActionButton = false;
+        this.status = 1;
         this.level = "0";
+        this.onhover = new EventEmitter();
+        this.onrevert = new EventEmitter();
     }
     /**
      * @return {?}
@@ -543,6 +674,31 @@ class DifferentiateTree {
     bubleup(event) {
         event.side = this.side;
         this.onhover.emit(event);
+    }
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    keyup(event) {
+        const /** @type {?} */ code = event.which;
+        if (code === 13) {
+            event.target.click();
+        }
+    }
+    /**
+     * @param {?} child
+     * @return {?}
+     */
+    undo(child) {
+        this.onrevert.emit(child);
+    }
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    revert(event) {
+        // bubble up the undo event.
+        this.onrevert.emit(event);
     }
     /**
      * @param {?} flag
@@ -584,10 +740,20 @@ DifferentiateTree.decorators = [
         [class.string]="depth > 0 && child.value && child.value.length"
         [innerHTML]="child.value ? child.value : '&nbsp;'">
       </span>
+      <span title="Undo"
+        class="undo"
+        tabindex="0"
+        aria-hidden="true"
+        (keyup)="keyup($event)"
+        (click)="undo(child)"
+        *ngIf="showActionButton && status !== child.status && child.status > 1">&#x238c;</span>
     </div>
     <differentiate-tree *ngIf="child.children.length"
         [level]="depth+1"
+        [status]="child.status"
+        [showActionButton]="showActionButton"
         (onhover)="bubleup($event)"
+        (onrevert)="revert($event)"
         [class.child-node]="child.parent != 4"
         [children]='child.children'></differentiate-tree>
     <div class="upper" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>
@@ -613,6 +779,18 @@ ul{
   width:100%; }
   ul li .hover{
     background-color:#ddd; }
+  ul li .tree-node{
+    position:relative; }
+    ul li .tree-node .undo{
+      position:absolute;
+      width:18px;
+      height:18px;
+      right:0;
+      margin:0 5px 0 0;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:1.2rem;
+      color:#9e2525; }
   ul.undefined li:hover{
     background-color:#ddd; }
   ul.left-side{
@@ -921,10 +1099,13 @@ ul{
 /** @nocollapse */
 DifferentiateTree.ctorParameters = () => [];
 DifferentiateTree.propDecorators = {
-    "onhover": [{ type: Output, args: ["onhover",] },],
     "children": [{ type: Input, args: ["children",] },],
+    "showActionButton": [{ type: Input, args: ["showActionButton",] },],
+    "status": [{ type: Input, args: ["status",] },],
     "side": [{ type: Input, args: ["side",] },],
     "level": [{ type: Input, args: ["level",] },],
+    "onhover": [{ type: Output, args: ["onhover",] },],
+    "onrevert": [{ type: Output, args: ["onrevert",] },],
 };
 
 /**

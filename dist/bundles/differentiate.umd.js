@@ -43,8 +43,10 @@ DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = "removed";
  */
 var DifferentiateComponent = (function () {
     function DifferentiateComponent() {
+        this.allowRevert = false;
         this.attributeOrderIsImportant = true;
         this.onlyShowDifferences = false;
+        this.onrevert = new core.EventEmitter();
     }
     /**
      * @return {?}
@@ -53,6 +55,50 @@ var DifferentiateComponent = (function () {
         var /** @type {?} */ min = 1;
         var /** @type {?} */ max = 10000;
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    /**
+     * @param {?} node
+     * @param {?} parent
+     * @return {?}
+     */
+    DifferentiateComponent.prototype.transformNodeToOriginalStructure = function (node, parent) {
+        var _this = this;
+        var /** @type {?} */ json = {};
+        var /** @type {?} */ array = [];
+        node.map(function (item) {
+            if (parent === DifferentiateNodeType.json) {
+                if (item.type === DifferentiateNodeType.literal) {
+                    array.push(item.value);
+                }
+                else if (item.type === DifferentiateNodeType.pair) {
+                    json[item.name] = item.value;
+                }
+                else if (item.type === DifferentiateNodeType.array) {
+                    var /** @type {?} */ x = _this.transformNodeToOriginalStructure(item.children, item.parent);
+                    if (item.name.length) {
+                        json[item.name] = x;
+                    }
+                    else {
+                        json = [x];
+                    }
+                }
+                else if (item.type === DifferentiateNodeType.json) {
+                    json[item.name] = _this.transformNodeToOriginalStructure(item.children, item.parent);
+                }
+            }
+            else if (parent === DifferentiateNodeType.array) {
+                if (item.type === DifferentiateNodeType.literal) {
+                    array.push(item.value);
+                }
+                else if (item.type === DifferentiateNodeType.json) {
+                    array.push(_this.transformNodeToOriginalStructure(item, item.parent));
+                }
+                else if (item.type === DifferentiateNodeType.array) {
+                    array.push(_this.transformNodeToOriginalStructure(item.children, item.parent));
+                }
+            }
+        });
+        return array.length ? array : json;
     };
     /**
      * @param {?} node
@@ -221,27 +267,37 @@ var DifferentiateComponent = (function () {
         if (leftNode.type !== rightNode.type) {
             leftNode.status = DifferentiateNodeStatus.typeChanged;
             rightNode.status = DifferentiateNodeStatus.typeChanged;
+            leftNode.counterpart = rightNode.id;
+            rightNode.counterpart = leftNode.id;
         }
         else if (leftNode.type === DifferentiateNodeType.literal) {
             if (leftNode.value !== rightNode.value) {
                 leftNode.status = DifferentiateNodeStatus.valueChanged;
                 rightNode.status = DifferentiateNodeStatus.valueChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
         }
         else if (leftNode.type === DifferentiateNodeType.pair) {
             if (leftNode.name !== rightNode.name) {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
             if (leftNode.value !== rightNode.value) {
                 leftNode.status = DifferentiateNodeStatus.valueChanged;
                 rightNode.status = DifferentiateNodeStatus.valueChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
         }
         else {
             if (leftNode.name !== rightNode.name) {
                 leftNode.status = DifferentiateNodeStatus.nameChanged;
                 rightNode.status = DifferentiateNodeStatus.nameChanged;
+                leftNode.counterpart = rightNode.id;
+                rightNode.counterpart = leftNode.id;
             }
             this.unify(leftNode.children, rightNode.children);
         }
@@ -270,6 +326,8 @@ var DifferentiateComponent = (function () {
         this.reIndex(side);
         item.status = status;
         newItem.status = status;
+        item.counterpart = newItem.id;
+        newItem.counterpart = item.id;
         this.setChildrenStatus(item.children, status);
         this.setChildrenStatus(newItem.children, status);
     };
@@ -473,6 +531,74 @@ var DifferentiateComponent = (function () {
         }
     };
     /**
+     * @param {?} side
+     * @param {?} id
+     * @return {?}
+     */
+    DifferentiateComponent.prototype.lookupChildOf = function (side, id) {
+        var _this = this;
+        var /** @type {?} */ foundItem = undefined;
+        if (side.children.length) {
+            side.children.map(function (item) {
+                if (!foundItem) {
+                    foundItem = _this.lookupChildOf(item, id);
+                    if (foundItem && foundItem.parent === undefined) {
+                        foundItem.parent = side;
+                    }
+                    else if (item.id === id) {
+                        foundItem = { parent: side, node: item };
+                    }
+                }
+            });
+        }
+        else if (side.id === id) {
+            foundItem = { parent: undefined, node: side };
+        }
+        return foundItem;
+    };
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    DifferentiateComponent.prototype.revert = function (event) {
+        var /** @type {?} */ leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
+        var /** @type {?} */ rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
+        if (event.status === DifferentiateNodeStatus.added) {
+            leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
+            rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
+            this.reIndex(leftSideInfo.parent.children);
+            this.reIndex(rightSideInfo.parent.children);
+        }
+        else if (event.status === DifferentiateNodeStatus.removed) {
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.nameChanged) {
+            rightSideInfo.node.name = leftSideInfo.node.name;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.valueChanged) {
+            rightSideInfo.node.value = leftSideInfo.node.value;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (event.status === DifferentiateNodeStatus.typeChanged) {
+            rightSideInfo.node.type = leftSideInfo.node.type;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            rightSideInfo.node.children = leftSideInfo.node.children;
+        }
+        this.onrevert.emit(this.transformNodeToOriginalStructure(this.rightSide[0].children, DifferentiateNodeType.json));
+    };
+    /**
      * @param {?} event
      * @return {?}
      */
@@ -493,17 +619,19 @@ var DifferentiateComponent = (function () {
 DifferentiateComponent.decorators = [
     { type: core.Component, args: [{
                 selector: 'differentiate',
-                template: "<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"left-side\"\n    (onhover)=\"onhover($event)\"\n    [children]=\"leftSide\"></differentiate-tree>\n<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"right-side\"\n    (onhover)=\"onhover($event)\"\n    [children]=\"rightSide\"></differentiate-tree>\n",
+                template: "<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"left-side\"\n    (onhover)=\"onhover($event)\"\n    [children]=\"leftSide\"></differentiate-tree>\n<differentiate-tree\n    class=\"root\"\n    level=\"0\"\n    side=\"right-side\"\n    [showActionButton]=\"allowRevert\"\n    (onhover)=\"onhover($event)\"\n    (onrevert)=\"revert($event)\"\n    [children]=\"rightSide\"></differentiate-tree>\n",
                 styles: [":host{\n  border:1px solid #444;\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:block;\n  max-width:100vw;\n  max-height:300px;\n  overflow-y:auto;\n  position:relative;\n  width:100%; }\n"],
             },] },
 ];
 /** @nocollapse */
 DifferentiateComponent.ctorParameters = function () { return []; };
 DifferentiateComponent.propDecorators = {
+    "allowRevert": [{ type: core.Input, args: ["allowRevert",] },],
     "attributeOrderIsImportant": [{ type: core.Input, args: ["attributeOrderIsImportant",] },],
     "onlyShowDifferences": [{ type: core.Input, args: ["onlyShowDifferences",] },],
     "leftSideObject": [{ type: core.Input, args: ["leftSideObject",] },],
     "rightSideObject": [{ type: core.Input, args: ["rightSideObject",] },],
+    "onrevert": [{ type: core.Output, args: ["onrevert",] },],
 };
 /**
  * @fileoverview added by tsickle
@@ -511,8 +639,11 @@ DifferentiateComponent.propDecorators = {
  */
 var DifferentiateTree = (function () {
     function DifferentiateTree() {
-        this.onhover = new core.EventEmitter();
+        this.showActionButton = false;
+        this.status = 1;
         this.level = "0";
+        this.onhover = new core.EventEmitter();
+        this.onrevert = new core.EventEmitter();
     }
     /**
      * @return {?}
@@ -527,6 +658,31 @@ var DifferentiateTree = (function () {
     DifferentiateTree.prototype.bubleup = function (event) {
         event.side = this.side;
         this.onhover.emit(event);
+    };
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    DifferentiateTree.prototype.keyup = function (event) {
+        var /** @type {?} */ code = event.which;
+        if (code === 13) {
+            event.target.click();
+        }
+    };
+    /**
+     * @param {?} child
+     * @return {?}
+     */
+    DifferentiateTree.prototype.undo = function (child) {
+        this.onrevert.emit(child);
+    };
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    DifferentiateTree.prototype.revert = function (event) {
+        // bubble up the undo event.
+        this.onrevert.emit(event);
     };
     /**
      * @param {?} flag
@@ -547,17 +703,20 @@ var DifferentiateTree = (function () {
 DifferentiateTree.decorators = [
     { type: core.Component, args: [{
                 selector: 'differentiate-tree',
-                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\"\n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\"\n    [class.removed]=\"child.status === 6\"\n    [class.type-changed]=\"child.status === 2\"\n    [class.name-changed]=\"child.status === 3\"\n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name'\n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value'\n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\"\n        [level]=\"depth+1\"\n        (onhover)=\"bubleup($event)\"\n        [class.child-node]=\"child.parent != 4\"\n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n",
-                styles: [":host{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:inline-block;\n  width:100%; }\n:host.root{\n  float:left;\n  width:50%; }\n:host.child-node{\n  float:left; }\nul{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  list-style:none;\n  padding:0;\n  width:100%; }\n  ul li .hover{\n    background-color:#ddd; }\n  ul.undefined li:hover{\n    background-color:#ddd; }\n  ul.left-side{\n    border-right:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.left-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.left-side li.added .name, ul.left-side li.added .value{\n        opacity:0.2;\n        font-style:italic; }\n      ul.left-side li.added .upper{\n        border-radius:0 0 100% 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        top:0;\n        right:0; }\n        ul.left-side li.added .upper.depth-1{\n          border:2px solid #285828;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-2{\n          border:2px dotted #3f9c3f;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-3{\n          border:1px solid #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-4{\n          border:1px dotted #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-5{\n          border:1px dashed #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n      ul.left-side li.added .lower{\n        border-radius:0 100% 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        bottom:0;\n        right:0; }\n        ul.left-side li.added .lower.depth-1{\n          border:2px solid #2c612c;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-2{\n          border:2px dotted #3f9c3f;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-3{\n          border:1px solid #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-4{\n          border:1px dotted #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-5{\n          border:1px dashed #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n      ul.left-side li.removed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.removed .upper:after{\n          content:' - ';\n          color:#f00;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.removed .lower{\n        display:none; }\n      ul.left-side li.removed .tree-node span{\n        color:#f00; }\n      ul.left-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.left-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.name-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.left-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:66px;\n        top:0;\n        right:0; }\n        ul.left-side li.value-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul.right-side{\n    border-left:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.right-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.right-side li.added .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:90%;\n        top:0;\n        left:0; }\n        ul.right-side li.added .upper:after{\n          content:'+';\n          color:#4a4;\n          font-weight:bold;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.added .lower{\n        display:none; }\n      ul.right-side li.added .tree-node span{\n        color:#4a4; }\n      ul.right-side li.removed .name, ul.right-side li.removed .value{\n        -webkit-text-decoration-line:line-through;\n                text-decoration-line:line-through;\n        -webkit-text-decoration-color:#ff0600;\n                text-decoration-color:#ff0600; }\n      ul.right-side li.removed .upper{\n        border-radius:0 0 0 100%;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        top:0; }\n        ul.right-side li.removed .upper.depth-1{\n          border:2px solid #700000;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-2{\n          border:2px dotted #ca0303;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-3{\n          border:1px solid #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-4{\n          border:1px dotted #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-5{\n          border:1px dashed #f00;\n          border-top-width:0;\n          border-right-width:0; }\n      ul.right-side li.removed .lower{\n        border-radius:100% 0 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        bottom:0; }\n        ul.right-side li.removed .lower.depth-1{\n          border:2px solid #700000;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-2{\n          border:2px dotted #ca0303;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-3{\n          border:1px solid #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-4{\n          border:1px dotted #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-5{\n          border:1px dashed #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n      ul.right-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.right-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.name-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.right-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.value-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul .tree-node{\n    -webkit-box-sizing:border-box;\n            box-sizing:border-box;\n    color:#7c9eb2;\n    display:table;\n    padding:0;\n    position:relative;\n    margin:0;\n    width:100%; }\n    ul .tree-node.depth-0{\n      padding-left:5px; }\n    ul .tree-node.depth-1{\n      padding-left:20px; }\n    ul .tree-node.depth-2{\n      padding-left:40px; }\n    ul .tree-node.depth-3{\n      padding-left:60px; }\n    ul .tree-node.depth-4{\n      padding-left:80px; }\n    ul .tree-node.depth-5{\n      padding-left:100px; }\n    ul .tree-node.depth-6{\n      padding-left:120px; }\n    ul .tree-node.depth-7{\n      padding-left:140px; }\n    ul .tree-node.depth-8{\n      padding-left:160px; }\n    ul .tree-node.depth-9{\n      padding-left:180px; }\n    ul .tree-node.depth-10{\n      padding-left:200px; }\n    ul .tree-node .name{\n      color:#444;\n      font-weight:bold; }\n      ul .tree-node .name:after{\n        content:':'; }\n    ul .tree-node .value.string:before{\n      content:'\"'; }\n    ul .tree-node .value.string:after{\n      content:'\"'; }\n"],
+                template: "<ul [class]=\"side\">\n  <li  *ngFor=\"let child of children\"\n    (mouseout)=\"mouseOvered(false, child.index)\"\n    (mouseover)=\"mouseOvered(true, child.index)\"\n    [class.hover]=\"child.hover\"\n    [class.added]=\"child.status === 5\"\n    [class.removed]=\"child.status === 6\"\n    [class.type-changed]=\"child.status === 2\"\n    [class.name-changed]=\"child.status === 3\"\n    [class.value-changed]=\"child.status === 4\">\n    <div class='tree-node'\n        [ngClass]=\"'depth-' + depth\"\n        [id] = \"child.id\">\n      <span *ngIf='child.name && child.name!=null'\n        class='name'\n        [innerHTML]=\"child.name.length ? child.name : '&nbsp;'\">\n      </span>\n      <span *ngIf='child.value && child.value!=null'\n        class='value'\n        [class.string]=\"depth > 0 && child.value && child.value.length\"\n        [innerHTML]=\"child.value ? child.value : '&nbsp;'\">\n      </span>\n      <span title=\"Undo\"\n        class=\"undo\"\n        tabindex=\"0\"\n        aria-hidden=\"true\"\n        (keyup)=\"keyup($event)\"\n        (click)=\"undo(child)\"\n        *ngIf=\"showActionButton && status !== child.status && child.status > 1\">&#x238c;</span>\n    </div>\n    <differentiate-tree *ngIf=\"child.children.length\"\n        [level]=\"depth+1\"\n        [status]=\"child.status\"\n        [showActionButton]=\"showActionButton\"\n        (onhover)=\"bubleup($event)\"\n        (onrevert)=\"revert($event)\"\n        [class.child-node]=\"child.parent != 4\"\n        [children]='child.children'></differentiate-tree>\n    <div class=\"upper\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n    <div class=\"lower\" [ngClass]=\"'depth-' + depth\" *ngIf=\"child.status > 2\"></div>\n  </li>\n</ul>\n",
+                styles: [":host{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  display:inline-block;\n  width:100%; }\n:host.root{\n  float:left;\n  width:50%; }\n:host.child-node{\n  float:left; }\nul{\n  -webkit-box-sizing:border-box;\n          box-sizing:border-box;\n  list-style:none;\n  padding:0;\n  width:100%; }\n  ul li .hover{\n    background-color:#ddd; }\n  ul li .tree-node{\n    position:relative; }\n    ul li .tree-node .undo{\n      position:absolute;\n      width:18px;\n      height:18px;\n      right:0;\n      margin:0 5px 0 0;\n      cursor:pointer;\n      font-weight:bold;\n      font-size:1.2rem;\n      color:#9e2525; }\n  ul.undefined li:hover{\n    background-color:#ddd; }\n  ul.left-side{\n    border-right:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.left-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.left-side li.added .name, ul.left-side li.added .value{\n        opacity:0.2;\n        font-style:italic; }\n      ul.left-side li.added .upper{\n        border-radius:0 0 100% 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        top:0;\n        right:0; }\n        ul.left-side li.added .upper.depth-1{\n          border:2px solid #285828;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-2{\n          border:2px dotted #3f9c3f;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-3{\n          border:1px solid #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-4{\n          border:1px dotted #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .upper.depth-5{\n          border:1px dashed #57d657;\n          border-top-width:0;\n          border-left-width:0; }\n      ul.left-side li.added .lower{\n        border-radius:0 100% 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        position:absolute;\n        pointer-events:none;\n        width:50%;\n        bottom:0;\n        right:0; }\n        ul.left-side li.added .lower.depth-1{\n          border:2px solid #2c612c;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-2{\n          border:2px dotted #3f9c3f;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-3{\n          border:1px solid #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-4{\n          border:1px dotted #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n        ul.left-side li.added .lower.depth-5{\n          border:1px dashed #57d657;\n          border-bottom-width:0;\n          border-left-width:0; }\n      ul.left-side li.removed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.removed .upper:after{\n          content:' - ';\n          color:#f00;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.removed .lower{\n        display:none; }\n      ul.left-side li.removed .tree-node span{\n        color:#f00; }\n      ul.left-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.left-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        width:66px;\n        top:0;\n        right:0;\n        pointer-events:none; }\n        ul.left-side li.name-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.left-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:66px;\n        top:0;\n        right:0; }\n        ul.left-side li.value-changed .upper:after{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-right:10px;\n          font-size:20px;\n          line-height:16px; }\n      ul.left-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul.right-side{\n    border-left:1px solid #444;\n    display:inline-block;\n    margin:0; }\n    ul.right-side li{\n      position:relative;\n      display:table;\n      width:100%; }\n      ul.right-side li.added .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        width:90%;\n        top:0;\n        left:0; }\n        ul.right-side li.added .upper:after{\n          content:'+';\n          color:#4a4;\n          font-weight:bold;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.added .lower{\n        display:none; }\n      ul.right-side li.added .tree-node span{\n        color:#4a4; }\n      ul.right-side li.removed .name, ul.right-side li.removed .value{\n        -webkit-text-decoration-line:line-through;\n                text-decoration-line:line-through;\n        -webkit-text-decoration-color:#ff0600;\n                text-decoration-color:#ff0600; }\n      ul.right-side li.removed .upper{\n        border-radius:0 0 0 100%;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        top:0; }\n        ul.right-side li.removed .upper.depth-1{\n          border:2px solid #700000;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-2{\n          border:2px dotted #ca0303;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-3{\n          border:1px solid #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-4{\n          border:1px dotted #f00;\n          border-top-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .upper.depth-5{\n          border:1px dashed #f00;\n          border-top-width:0;\n          border-right-width:0; }\n      ul.right-side li.removed .lower{\n        border-radius:100% 0 0 0;\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:50%;\n        width:10%;\n        position:absolute;\n        pointer-events:none;\n        bottom:0; }\n        ul.right-side li.removed .lower.depth-1{\n          border:2px solid #700000;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-2{\n          border:2px dotted #ca0303;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-3{\n          border:1px solid #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-4{\n          border:1px dotted #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n        ul.right-side li.removed .lower.depth-5{\n          border:1px dashed #f00;\n          border-bottom-width:0;\n          border-right-width:0; }\n      ul.right-side li.type-changed .tree-node span{\n        color:#f00; }\n      ul.right-side li.name-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.name-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.name-changed .tree-node .name{\n        color:#00f; }\n      ul.right-side li.value-changed .upper{\n        -webkit-box-sizing:border-box;\n                box-sizing:border-box;\n        height:100%;\n        position:absolute;\n        pointer-events:none;\n        top:0;\n        left:0; }\n        ul.right-side li.value-changed .upper:before{\n          content:' ~ ';\n          color:#00f;\n          font-weight:bold;\n          float:right;\n          padding-left:5px;\n          font-size:20px;\n          line-height:16px; }\n      ul.right-side li.value-changed .tree-node .value{\n        color:#00f; }\n  ul .tree-node{\n    -webkit-box-sizing:border-box;\n            box-sizing:border-box;\n    color:#7c9eb2;\n    display:table;\n    padding:0;\n    position:relative;\n    margin:0;\n    width:100%; }\n    ul .tree-node.depth-0{\n      padding-left:5px; }\n    ul .tree-node.depth-1{\n      padding-left:20px; }\n    ul .tree-node.depth-2{\n      padding-left:40px; }\n    ul .tree-node.depth-3{\n      padding-left:60px; }\n    ul .tree-node.depth-4{\n      padding-left:80px; }\n    ul .tree-node.depth-5{\n      padding-left:100px; }\n    ul .tree-node.depth-6{\n      padding-left:120px; }\n    ul .tree-node.depth-7{\n      padding-left:140px; }\n    ul .tree-node.depth-8{\n      padding-left:160px; }\n    ul .tree-node.depth-9{\n      padding-left:180px; }\n    ul .tree-node.depth-10{\n      padding-left:200px; }\n    ul .tree-node .name{\n      color:#444;\n      font-weight:bold; }\n      ul .tree-node .name:after{\n        content:':'; }\n    ul .tree-node .value.string:before{\n      content:'\"'; }\n    ul .tree-node .value.string:after{\n      content:'\"'; }\n"],
             },] },
 ];
 /** @nocollapse */
 DifferentiateTree.ctorParameters = function () { return []; };
 DifferentiateTree.propDecorators = {
-    "onhover": [{ type: core.Output, args: ["onhover",] },],
     "children": [{ type: core.Input, args: ["children",] },],
+    "showActionButton": [{ type: core.Input, args: ["showActionButton",] },],
+    "status": [{ type: core.Input, args: ["status",] },],
     "side": [{ type: core.Input, args: ["side",] },],
     "level": [{ type: core.Input, args: ["level",] },],
+    "onhover": [{ type: core.Output, args: ["onhover",] },],
+    "onrevert": [{ type: core.Output, args: ["onrevert",] },],
 };
 /**
  * @fileoverview added by tsickle

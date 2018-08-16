@@ -68,6 +68,8 @@
   </select>
 </div>
 <differentiate 
+    allowRevert="true"
+    (onrevert)="revert($event)"
     [onlyShowDifferences]="onlyShowDifferences"
     [attributeOrderIsImportant]="attributeOrderIsImportant"
     [leftSideObject]="lefttree" 
@@ -77,3 +79,7 @@
   <div class="json-view left" [innerHTML]="lefttree | json"></div>
   <div class="json-view right" [innerHTML]="righttree | json"></div>  
 </div>
+
+<ul class="json-view">
+  <li [innerHTML]="action" *ngFor="let action of actions"></li>
+</ul>

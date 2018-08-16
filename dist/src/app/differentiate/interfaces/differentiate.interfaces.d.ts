@@ -14,6 +14,7 @@ export declare enum DifferentiateNodeStatus {
 }
 export interface DifferentiateNode {
     id: number;
+    counterpart?: number;
     index: number;
     name: string;
     altName: string;

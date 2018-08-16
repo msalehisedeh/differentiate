@@ -20,6 +20,21 @@ ul {
     .hover{
       background-color: #ddd;
     }
+    .tree-node {
+      position: relative;
+
+      .undo {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        right: 0;
+        margin: 0 5px 0 0;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #9e2525;
+      }
+    }
   }
 
   &.undefined {

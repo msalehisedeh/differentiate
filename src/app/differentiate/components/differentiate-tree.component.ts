@@ -19,17 +19,26 @@ import {
 export class DifferentiateTree implements OnInit{
   depth: number;
 
-  @Output("onhover")
-  onhover = new EventEmitter();
-
   @Input("children")
   children;
+
+  @Input("showActionButton")
+  showActionButton = false;
+
+  @Input("status")
+  status = 1;
 
   @Input("side")
   side;
 
   @Input("level")
   level = "0";
+
+  @Output("onhover")
+  onhover = new EventEmitter();
+
+  @Output("onrevert")
+  onrevert = new EventEmitter();
 
   ngOnInit() {
     this.depth = parseInt(this.level);
@@ -38,6 +47,21 @@ export class DifferentiateTree implements OnInit{
   bubleup(event) {
     event.side = this.side;
     this.onhover.emit(event);
+  }
+
+  keyup(event) {
+    const code = event.which;
+    if (code === 13) {
+      event.target.click();
+		}
+  }
+
+  undo(child) {
+    this.onrevert.emit(child);
+  }
+  revert(event) {
+    // bubble up the undo event.
+    this.onrevert.emit(event);
   }
 
   mouseOvered(flag, i) {
