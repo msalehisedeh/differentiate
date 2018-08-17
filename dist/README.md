@@ -1,11 +1,12 @@
 # Welcome to Differentiate Objects!
 
 Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to clearly see what is changed on either objects on the fly while they change?
-Would you like to know how it can be done? Would you like to have it done without writing code for it? Take a look at the demo and enjoy the ride...
+Would you like to know how it can be done? Would you like to have it done without writing code for it? Take a look at the demo and enjoy the ride.
 
 Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
 
-**NOTE:** Version 1.5.0 is the latest version compatible with Angular 2+, 4++, or 5+.
+**NOTE:** Version 1.5.0 is the latest version compatible with Angular 2+, 4+, or 5+.
+
 **NOTE:** Version 2.0.0 is the first version compatible with Angular 6+.
 
 
@@ -26,6 +27,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |----------------------|------------------------------------------------|
 |onrevert              |Will be fired when any one of changed items on right hand-side should be reverted back to mimic item on left hand-side.    |
 
+
+# Version 2.0.1
+To create impression of performance when comparing large size JSON objects, made the process non-blocking and added a wait spinner.
 
 # Version 2.0.0
 updated dependencies (no code change) to work with Angular 6 which will not fit within Angular 5, 4, or 2 because of a change made by angular folks.

@@ -23,6 +23,7 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     private filterUnchanged;
     ngOnChanges(changes: any): void;
     ngOnInit(): void;
+    private init;
     private lookupChildOf;
     revert(event: any): void;
     onhover(event: any): void;

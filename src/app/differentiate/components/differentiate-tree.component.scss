@@ -23,6 +23,10 @@ ul {
     .tree-node {
       position: relative;
 
+      &.depth-0 {
+        display: none;
+      }
+
       .undo {
         position: absolute;
         width: 18px;

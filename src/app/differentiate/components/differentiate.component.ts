@@ -424,12 +424,15 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    setTimeout(()=>this.init(),66);
+  }
+  private init() {
     if (this.leftSideObject && this.rightSideObject) {
       const comparision = this.toInternalStruction(this.leftSideObject, this.rightSideObject);
       this.leftSide = [{
         id: this.generateNodeId(),
         name: "",
-        value: "Root Object",
+        value: "Root",
         parent: DifferentiateNodeType.array,
         type: DifferentiateNodeType.array,
         expanded: true,
@@ -439,7 +442,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       this.rightSide= [{
         id: this.generateNodeId(),
         name: "",
-        value: "Root Object",
+        value: "Root",
         parent: DifferentiateNodeType.array,
         type: DifferentiateNodeType.array,
         expanded: true,
@@ -499,12 +502,14 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status)
       rightSideInfo.node.children = leftSideInfo.node.children;
     }
-    this.onrevert.emit(
-      this.transformNodeToOriginalStructure(
-        this.rightSide[0].children, 
-        DifferentiateNodeType.json
-      )
-    );
+    setTimeout(() =>{
+      this.onrevert.emit(
+        this.transformNodeToOriginalStructure(
+          this.rightSide[0].children, 
+          DifferentiateNodeType.json
+        )
+      );
+    }, 66);
   }
   onhover(event) {
     let children;
