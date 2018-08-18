@@ -2,12 +2,15 @@ import { OnInit, OnChanges, EventEmitter } from '@angular/core';
 export declare class DifferentiateComponent implements OnInit, OnChanges {
     leftSide: any;
     rightSide: any;
+    ready: boolean;
     allowRevert: boolean;
+    allowAdvance: boolean;
     attributeOrderIsImportant: boolean;
     onlyShowDifferences: boolean;
     leftSideObject: any;
     rightSideObject: any;
     onrevert: EventEmitter<{}>;
+    onadvance: EventEmitter<{}>;
     constructor();
     private generateNodeId;
     private transformNodeToOriginalStructure;
@@ -25,6 +28,8 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     ngOnInit(): void;
     private init;
     private lookupChildOf;
-    revert(event: any): void;
+    private performAdvanceToRight;
+    private performAdvanceToLeft;
+    advance(event: any): void;
     onhover(event: any): void;
 }

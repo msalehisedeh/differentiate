@@ -42,9 +42,11 @@ DifferentiateNodeStatus[DifferentiateNodeStatus.removed] = 'removed';
 class DifferentiateComponent {
     constructor() {
         this.allowRevert = false;
+        this.allowAdvance = false;
         this.attributeOrderIsImportant = true;
         this.onlyShowDifferences = false;
         this.onrevert = new EventEmitter();
+        this.onadvance = new EventEmitter();
     }
     /**
      * @return {?}
@@ -512,9 +514,11 @@ class DifferentiateComponent {
      */
     ngOnChanges(changes) {
         if (changes.attributeOrderIsImportant) {
+            this.ready = false;
             this.ngOnInit();
         }
         if (changes.onlyShowDifferences) {
+            this.ready = false;
             this.ngOnInit();
         }
         if (changes.leftSideObject) {
@@ -528,7 +532,7 @@ class DifferentiateComponent {
      * @return {?}
      */
     ngOnInit() {
-        setTimeout(() => this.init(), 66);
+        setTimeout(() => this.init(), 666);
     }
     /**
      * @return {?}
@@ -557,6 +561,7 @@ class DifferentiateComponent {
                     isRoot: true,
                     children: comparision.rightSide
                 }];
+            setTimeout(() => { this.ready = true; }, 333);
         }
     }
     /**
@@ -586,41 +591,83 @@ class DifferentiateComponent {
         return foundItem;
     }
     /**
-     * @param {?} event
+     * @param {?} leftSideInfo
+     * @param {?} rightSideInfo
+     * @param {?} status
      * @return {?}
      */
-    revert(event) {
-        /** @type {?} */
-        let leftSideInfo = this.lookupChildOf(this.leftSide[0], event.counterpart);
-        /** @type {?} */
-        let rightSideInfo = this.lookupChildOf(this.rightSide[0], event.id);
-        if (event.status === DifferentiateNodeStatus.added) {
+    performAdvanceToRight(leftSideInfo, rightSideInfo, status) {
+        if (status === DifferentiateNodeStatus.removed) {
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (status === DifferentiateNodeStatus.added) {
             leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
             rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
             this.reIndex(leftSideInfo.parent.children);
             this.reIndex(rightSideInfo.parent.children);
         }
-        else if (event.status === DifferentiateNodeStatus.removed) {
-            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+        else if (status === DifferentiateNodeStatus.nameChanged) {
+            leftSideInfo.node.name = rightSideInfo.node.name;
             leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
             this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
             this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
         }
-        else if (event.status === DifferentiateNodeStatus.nameChanged) {
-            rightSideInfo.node.name = leftSideInfo.node.name;
-            rightSideInfo.node.status = DifferentiateNodeStatus.default;
-            leftSideInfo.node.status = DifferentiateNodeStatus.default;
-            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
-            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
-        }
-        else if (event.status === DifferentiateNodeStatus.valueChanged) {
+        else if (status === DifferentiateNodeStatus.valueChanged) {
             rightSideInfo.node.value = leftSideInfo.node.value;
             rightSideInfo.node.status = DifferentiateNodeStatus.default;
             leftSideInfo.node.status = DifferentiateNodeStatus.default;
             this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
             this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
         }
-        else if (event.status === DifferentiateNodeStatus.typeChanged) {
+        else if (status === DifferentiateNodeStatus.typeChanged) {
+            leftSideInfo.node.type = rightSideInfo.node.type;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            leftSideInfo.node.children = rightSideInfo.node.children;
+        }
+        setTimeout(() => {
+            this.onadvance.emit(this.transformNodeToOriginalStructure(this.leftSide[0].children, DifferentiateNodeType.json));
+        }, 66);
+    }
+    /**
+     * @param {?} leftSideInfo
+     * @param {?} rightSideInfo
+     * @param {?} status
+     * @return {?}
+     */
+    performAdvanceToLeft(leftSideInfo, rightSideInfo, status) {
+        if (status === DifferentiateNodeStatus.added) {
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (status === DifferentiateNodeStatus.removed) {
+            leftSideInfo.parent.children.splice(leftSideInfo.node.index, 1);
+            rightSideInfo.parent.children.splice(rightSideInfo.node.index, 1);
+            this.reIndex(leftSideInfo.parent.children);
+            this.reIndex(rightSideInfo.parent.children);
+        }
+        else if (status === DifferentiateNodeStatus.nameChanged) {
+            rightSideInfo.node.name = leftSideInfo.node.name;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (status === DifferentiateNodeStatus.valueChanged) {
+            leftSideInfo.node.value = rightSideInfo.node.value;
+            leftSideInfo.node.status = DifferentiateNodeStatus.default;
+            rightSideInfo.node.status = DifferentiateNodeStatus.default;
+            this.setChildrenStatus(leftSideInfo.node.children, leftSideInfo.node.status);
+            this.setChildrenStatus(rightSideInfo.node.children, rightSideInfo.node.status);
+        }
+        else if (status === DifferentiateNodeStatus.typeChanged) {
             rightSideInfo.node.type = leftSideInfo.node.type;
             rightSideInfo.node.status = DifferentiateNodeStatus.default;
             leftSideInfo.node.status = DifferentiateNodeStatus.default;
@@ -630,6 +677,18 @@ class DifferentiateComponent {
         setTimeout(() => {
             this.onrevert.emit(this.transformNodeToOriginalStructure(this.rightSide[0].children, DifferentiateNodeType.json));
         }, 66);
+    }
+    /**
+     * @param {?} event
+     * @return {?}
+     */
+    advance(event) {
+        if (event.type === 'advance') {
+            this.performAdvanceToLeft(this.lookupChildOf(this.leftSide[0], event.node.id), this.lookupChildOf(this.rightSide[0], event.node.counterpart), event.node.status);
+        }
+        else {
+            this.performAdvanceToRight(this.lookupChildOf(this.leftSide[0], event.node.counterpart), this.lookupChildOf(this.rightSide[0], event.node.id), event.node.status);
+        }
     }
     /**
      * @param {?} event
@@ -652,7 +711,7 @@ class DifferentiateComponent {
 DifferentiateComponent.decorators = [
     { type: Component, args: [{
                 selector: 'differentiate',
-                template: `<div class="spinner" *ngIf="!leftSide || !rightSide">
+                template: `<div class="spinner" *ngIf="!ready">
     <svg 
         version="1.1" 
         id="loader" 
@@ -679,35 +738,39 @@ DifferentiateComponent.decorators = [
   </svg>
 </div>
 <differentiate-tree 
-    *ngIf="leftSide"
+    *ngIf="leftSide && rightSide"
     class="root" 
     level="0" 
     side="left-side" 
     (onhover)="onhover($event)"
+    (onrevert)="advance($event)"
+    [showLeftActionButton]="allowAdvance" 
     [children]="leftSide"></differentiate-tree>
 <differentiate-tree 
-    *ngIf="rightSide"
+    *ngIf="leftSide && rightSide"
     class="root" 
     level="0" 
     side="right-side" 
-    [showActionButton]="allowRevert" 
     (onhover)="onhover($event)"
-    (onrevert)="revert($event)"
+    (onrevert)="advance($event)"
+    [showRightActionButton]="allowRevert" 
     [children]="rightSide"></differentiate-tree>
 
 `,
-                styles: [`:host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top}:host svg path,:host svg rect{fill:#1c0696}`],
+                styles: [`:host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;min-height:100px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top;position:absolute;top:0;left:10%}:host svg path,:host svg rect{fill:#1c0696}`],
             },] },
 ];
 /** @nocollapse */
 DifferentiateComponent.ctorParameters = () => [];
 DifferentiateComponent.propDecorators = {
     allowRevert: [{ type: Input, args: ["allowRevert",] }],
+    allowAdvance: [{ type: Input, args: ["allowAdvance",] }],
     attributeOrderIsImportant: [{ type: Input, args: ["attributeOrderIsImportant",] }],
     onlyShowDifferences: [{ type: Input, args: ["onlyShowDifferences",] }],
     leftSideObject: [{ type: Input, args: ["leftSideObject",] }],
     rightSideObject: [{ type: Input, args: ["rightSideObject",] }],
-    onrevert: [{ type: Output, args: ["onrevert",] }]
+    onrevert: [{ type: Output, args: ["onrevert",] }],
+    onadvance: [{ type: Output, args: ["onadvance",] }]
 };
 
 /**
@@ -716,7 +779,8 @@ DifferentiateComponent.propDecorators = {
  */
 class DifferentiateTree {
     constructor() {
-        this.showActionButton = false;
+        this.showLeftActionButton = false;
+        this.showRightActionButton = false;
         this.status = 1;
         this.level = "0";
         this.onhover = new EventEmitter();
@@ -751,14 +815,21 @@ class DifferentiateTree {
      * @param {?} child
      * @return {?}
      */
-    undo(child) {
-        this.onrevert.emit(child);
+    advanceToRightSide(child) {
+        this.onrevert.emit({ type: "advance", node: child });
+    }
+    /**
+     * @param {?} child
+     * @return {?}
+     */
+    advanceToLeftSide(child) {
+        this.onrevert.emit({ type: "revert", node: child });
     }
     /**
      * @param {?} event
      * @return {?}
      */
-    revert(event) {
+    advance(event) {
         // bubble up the undo event.
         this.onrevert.emit(event);
     }
@@ -793,6 +864,13 @@ DifferentiateTree.decorators = [
     <div class='tree-node'
         [ngClass]="'depth-' + depth"
         [id] = "child.id">
+      <span title="take right side"
+        class="do" 
+        tabindex="0"
+        aria-hidden="true"
+        (keyup)="keyup($event)"
+        (click)="advanceToRightSide(child)"
+        *ngIf="showLeftActionButton && status !== child.status && child.status > 1">&#9100;</span>
       <span *ngIf='child.name && child.name!=null'
         class='name' 
         [innerHTML]="child.name.length ? child.name : '&nbsp;'">
@@ -802,20 +880,21 @@ DifferentiateTree.decorators = [
         [class.string]="depth > 0 && child.value && child.value.length"
         [innerHTML]="child.value ? child.value : '&nbsp;'">
       </span>
-      <span title="Undo"
+      <span title="take left side"
         class="undo" 
         tabindex="0"
         aria-hidden="true"
         (keyup)="keyup($event)"
-        (click)="undo(child)"
-        *ngIf="showActionButton && status !== child.status && child.status > 1">&#x238c;</span>
+        (click)="advanceToLeftSide(child)"
+        *ngIf="showRightActionButton && status !== child.status && child.status > 1">&#9100;</span>
     </div>
     <differentiate-tree *ngIf="child.children.length" 
         [level]="depth+1" 
         [status]="child.status" 
-        [showActionButton]="showActionButton" 
+        [showLeftActionButton]="showLeftActionButton" 
+        [showRightActionButton]="showRightActionButton" 
         (onhover)="bubleup($event)"
-        (onrevert)="revert($event)"
+        (onrevert)="advance($event)"
         [class.child-node]="child.parent != 4" 
         [children]='child.children'></differentiate-tree>
     <div class="upper" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>
@@ -824,12 +903,13 @@ DifferentiateTree.decorators = [
 </ul>
 
 `,
-                styles: [`:host{-webkit-box-sizing:border-box;box-sizing:border-box;display:inline-block;width:100%}:host.root{float:left;width:50%}:host.child-node{float:left}ul{-webkit-box-sizing:border-box;box-sizing:border-box;list-style:none;padding:0;width:100%}ul li .hover{background-color:#ddd}ul li .tree-node{position:relative}ul li .tree-node.depth-0{display:none}ul li .tree-node .undo{position:absolute;width:18px;height:18px;right:0;margin:0 5px 0 0;cursor:pointer;font-weight:700;font-size:1.2rem;color:#9e2525}ul.undefined li:hover{background-color:#ddd}ul.left-side{border-right:1px solid #444;display:inline-block;margin:0}ul.left-side li{position:relative;display:table;width:100%}ul.left-side li.added .name,ul.left-side li.added .value{opacity:.2;font-style:italic}ul.left-side li.added .upper{border-radius:0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;top:0;right:0}ul.left-side li.added .upper.depth-1{border:2px solid #285828;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-2{border:2px dotted #3f9c3f;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-3{border:1px solid #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-4{border:1px dotted #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-5{border:1px dashed #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .lower{border-radius:0 100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;bottom:0;right:0}ul.left-side li.added .lower.depth-1{border:2px solid #2c612c;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-2{border:2px dotted #3f9c3f;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-3{border:1px solid #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-4{border:1px dotted #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-5{border:1px dashed #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.removed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.removed .upper:after{content:' - ';color:red;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.removed .lower{display:none}ul.left-side li.removed .tree-node span,ul.left-side li.type-changed .tree-node span{color:red}ul.left-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.name-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.name-changed .tree-node .name{color:#00f}ul.left-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:66px;top:0;right:0}ul.left-side li.value-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.value-changed .tree-node .value{color:#00f}ul.right-side{border-left:1px solid #444;display:inline-block;margin:0}ul.right-side li{position:relative;display:table;width:100%}ul.right-side li.added .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:90%;top:0;left:0}ul.right-side li.added .upper:after{content:'+';color:#4a4;font-weight:700;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.added .lower{display:none}ul.right-side li.added .tree-node span{color:#4a4}ul.right-side li.removed .name,ul.right-side li.removed .value{-webkit-text-decoration-line:line-through;text-decoration-line:line-through;-webkit-text-decoration-color:#ff0600;text-decoration-color:#ff0600}ul.right-side li.removed .upper{border-radius:0 0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;top:0}ul.right-side li.removed .upper.depth-1{border:2px solid #700000;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-2{border:2px dotted #ca0303;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-3{border:1px solid red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-4{border:1px dotted red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-5{border:1px dashed red;border-top-width:0;border-right-width:0}ul.right-side li.removed .lower{border-radius:100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;bottom:0}ul.right-side li.removed .lower.depth-1{border:2px solid #700000;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-2{border:2px dotted #ca0303;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-3{border:1px solid red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-4{border:1px dotted red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-5{border:1px dashed red;border-bottom-width:0;border-right-width:0}ul.right-side li.type-changed .tree-node span{color:red}ul.right-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.name-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.name-changed .tree-node .name{color:#00f}ul.right-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.value-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.value-changed .tree-node .value{color:#00f}ul .tree-node{-webkit-box-sizing:border-box;box-sizing:border-box;color:#7c9eb2;display:table;padding:0;position:relative;margin:0;width:100%}ul .tree-node.depth-0{padding-left:5px}ul .tree-node.depth-1{padding-left:20px}ul .tree-node.depth-2{padding-left:40px}ul .tree-node.depth-3{padding-left:60px}ul .tree-node.depth-4{padding-left:80px}ul .tree-node.depth-5{padding-left:100px}ul .tree-node.depth-6{padding-left:120px}ul .tree-node.depth-7{padding-left:140px}ul .tree-node.depth-8{padding-left:160px}ul .tree-node.depth-9{padding-left:180px}ul .tree-node.depth-10{padding-left:200px}ul .tree-node .name{color:#444;font-weight:700}ul .tree-node .name:after{content:':'}ul .tree-node .value.string:after,ul .tree-node .value.string:before{content:'"'}`],
+                styles: [`:host{-webkit-box-sizing:border-box;box-sizing:border-box;display:inline-block;width:100%}:host.root{float:left;width:50%}:host.child-node{float:left}ul{-webkit-box-sizing:border-box;box-sizing:border-box;list-style:none;padding:0;width:100%}ul li .hover{background-color:#ddd}ul li .tree-node{position:relative}ul li .tree-node.depth-0{display:none}ul li .tree-node .do,ul li .tree-node .undo{position:absolute;width:18px;height:18px;cursor:pointer;margin:-7px 5px 0 0;font-size:1.5rem;color:#9e2525;z-index:2}ul li .tree-node .undo{right:0}ul li .tree-node .do{left:0}ul.undefined li:hover{background-color:#ddd}ul.left-side{border-right:1px solid #444;display:inline-block;margin:0}ul.left-side li{position:relative;display:table;width:100%}ul.left-side li.added .name,ul.left-side li.added .value{opacity:.2;font-style:italic}ul.left-side li.added .upper{border-radius:0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;top:0;right:0}ul.left-side li.added .upper.depth-1{border:2px solid #285828;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-2{border:2px dotted #3f9c3f;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-3{border:1px solid #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-4{border:1px dotted #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .upper.depth-5{border:1px dashed #57d657;border-top-width:0;border-left-width:0}ul.left-side li.added .lower{border-radius:0 100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;position:absolute;pointer-events:none;width:50%;bottom:0;right:0}ul.left-side li.added .lower.depth-1{border:2px solid #2c612c;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-2{border:2px dotted #3f9c3f;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-3{border:1px solid #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-4{border:1px dotted #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.added .lower.depth-5{border:1px dashed #57d657;border-bottom-width:0;border-left-width:0}ul.left-side li.removed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.removed .upper:after{content:' - ';color:red;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.removed .lower{display:none}ul.left-side li.removed .tree-node span,ul.left-side li.type-changed .tree-node span{color:red}ul.left-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;width:66px;top:0;right:0;pointer-events:none}ul.left-side li.name-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.name-changed .tree-node .name{color:#00f}ul.left-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:66px;top:0;right:0}ul.left-side li.value-changed .upper:after{content:' ~ ';color:#00f;font-weight:700;float:right;padding-right:10px;font-size:20px;line-height:16px}ul.left-side li.value-changed .tree-node .value{color:#00f}ul.right-side{border-left:1px solid #444;display:inline-block;margin:0}ul.right-side li{position:relative;display:table;width:100%}ul.right-side li.added .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;width:90%;top:0;left:0}ul.right-side li.added .upper:after{content:'+';color:#4a4;font-weight:700;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.added .lower{display:none}ul.right-side li.added .tree-node span{color:#4a4}ul.right-side li.removed .name,ul.right-side li.removed .value{-webkit-text-decoration-line:line-through;text-decoration-line:line-through;-webkit-text-decoration-color:#ff0600;text-decoration-color:#ff0600}ul.right-side li.removed .upper{border-radius:0 0 0 100%;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;top:0}ul.right-side li.removed .upper.depth-1{border:2px solid #700000;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-2{border:2px dotted #ca0303;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-3{border:1px solid red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-4{border:1px dotted red;border-top-width:0;border-right-width:0}ul.right-side li.removed .upper.depth-5{border:1px dashed red;border-top-width:0;border-right-width:0}ul.right-side li.removed .lower{border-radius:100% 0 0;-webkit-box-sizing:border-box;box-sizing:border-box;height:50%;width:10%;position:absolute;pointer-events:none;bottom:0}ul.right-side li.removed .lower.depth-1{border:2px solid #700000;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-2{border:2px dotted #ca0303;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-3{border:1px solid red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-4{border:1px dotted red;border-bottom-width:0;border-right-width:0}ul.right-side li.removed .lower.depth-5{border:1px dashed red;border-bottom-width:0;border-right-width:0}ul.right-side li.type-changed .tree-node span{color:red}ul.right-side li.name-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.name-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.name-changed .tree-node .name{color:#00f}ul.right-side li.value-changed .upper{-webkit-box-sizing:border-box;box-sizing:border-box;height:100%;position:absolute;pointer-events:none;top:0;left:0}ul.right-side li.value-changed .upper:before{content:' ~ ';color:#00f;font-weight:700;float:right;padding-left:5px;font-size:20px;line-height:16px}ul.right-side li.value-changed .tree-node .value{color:#00f}ul .tree-node{-webkit-box-sizing:border-box;box-sizing:border-box;color:#7c9eb2;display:table;padding:0;position:relative;margin:0;width:100%}ul .tree-node.depth-0{padding-left:5px}ul .tree-node.depth-1{padding-left:20px}ul .tree-node.depth-2{padding-left:40px}ul .tree-node.depth-3{padding-left:60px}ul .tree-node.depth-4{padding-left:80px}ul .tree-node.depth-5{padding-left:100px}ul .tree-node.depth-6{padding-left:120px}ul .tree-node.depth-7{padding-left:140px}ul .tree-node.depth-8{padding-left:160px}ul .tree-node.depth-9{padding-left:180px}ul .tree-node.depth-10{padding-left:200px}ul .tree-node .name{color:#444;font-weight:700}ul .tree-node .name:after{content:':'}ul .tree-node .value.string:after,ul .tree-node .value.string:before{content:'"'}`],
             },] },
 ];
 DifferentiateTree.propDecorators = {
     children: [{ type: Input, args: ["children",] }],
-    showActionButton: [{ type: Input, args: ["showActionButton",] }],
+    showLeftActionButton: [{ type: Input, args: ["showLeftActionButton",] }],
+    showRightActionButton: [{ type: Input, args: ["showRightActionButton",] }],
     status: [{ type: Input, args: ["status",] }],
     side: [{ type: Input, args: ["side",] }],
     level: [{ type: Input, args: ["level",] }],

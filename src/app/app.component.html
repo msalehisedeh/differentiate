@@ -69,7 +69,9 @@
 </div>
 <differentiate 
     allowRevert="true"
+    allowAdvance="true"
     (onrevert)="revert($event)"
+    (onadvance)="advance($event)"
     [onlyShowDifferences]="onlyShowDifferences"
     [attributeOrderIsImportant]="attributeOrderIsImportant"
     [leftSideObject]="lefttree" 

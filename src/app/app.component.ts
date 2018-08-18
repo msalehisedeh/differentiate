@@ -151,6 +151,9 @@ export class AppComponent {
     }
   }
   revert(event) {
-    console.log(event);
+    console.log("revert", event);
+  }
+  advance(event) {
+    console.log("advance", event);
   }
 }

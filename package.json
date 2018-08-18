@@ -1,6 +1,6 @@
 {
   "name": "differentiate",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -20,6 +20,7 @@
     "differ",
     "difference",
     "compare",
+    "compare and merge",
     "compare JSON",
     "compare Objects",
     "comparison",
@@ -27,6 +28,7 @@
     "JSON comparison",
     "revert back",
     "merge",
+    "merge tool",
     "nifty",
     "visual",
     "pretty",

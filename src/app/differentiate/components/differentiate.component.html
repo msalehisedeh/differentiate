@@ -1,4 +1,4 @@
-<div class="spinner" *ngIf="!leftSide || !rightSide">
+<div class="spinner" *ngIf="!ready">
     <svg 
         version="1.1" 
         id="loader" 
@@ -25,19 +25,21 @@
   </svg>
 </div>
 <differentiate-tree 
-    *ngIf="leftSide"
+    *ngIf="leftSide && rightSide"
     class="root" 
     level="0" 
     side="left-side" 
     (onhover)="onhover($event)"
+    (onrevert)="advance($event)"
+    [showLeftActionButton]="allowAdvance" 
     [children]="leftSide"></differentiate-tree>
 <differentiate-tree 
-    *ngIf="rightSide"
+    *ngIf="leftSide && rightSide"
     class="root" 
     level="0" 
     side="right-side" 
-    [showActionButton]="allowRevert" 
     (onhover)="onhover($event)"
-    (onrevert)="revert($event)"
+    (onrevert)="advance($event)"
+    [showRightActionButton]="allowRevert" 
     [children]="rightSide"></differentiate-tree>
 

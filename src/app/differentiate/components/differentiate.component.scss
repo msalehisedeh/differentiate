@@ -4,6 +4,7 @@
   display: block;
   max-width: 100vw;
   max-height: 300px;
+  min-height: 100px;
   overflow-y: auto;
   position: relative;
   width: 100%;
@@ -17,6 +18,9 @@
     margin: 0 auto 1em;
     display: inline-block;
     vertical-align: top;
+    position: absolute;
+    top: 0;
+    left: 10%;
   }
   svg path, svg rect{
     fill: #1c0696;

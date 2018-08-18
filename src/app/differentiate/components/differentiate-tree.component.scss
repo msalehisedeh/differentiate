@@ -27,16 +27,21 @@ ul {
         display: none;
       }
 
-      .undo {
+      .undo,.do {
         position: absolute;
         width: 18px;
         height: 18px;
-        right: 0;
-        margin: 0 5px 0 0;
         cursor: pointer;
-        font-weight: bold;
-        font-size: 1.2rem;
+        margin: -7px 5px 0 0;
+        font-size: 1.5rem;
         color: #9e2525;
+        z-index: 2;
+      }
+      .undo {
+        right: 0;
+      }
+      .do {
+        left: 0;
       }
     }
   }

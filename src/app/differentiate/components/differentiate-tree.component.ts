@@ -22,8 +22,11 @@ export class DifferentiateTree implements OnInit{
   @Input("children")
   children;
 
-  @Input("showActionButton")
-  showActionButton = false;
+  @Input("showLeftActionButton")
+  showLeftActionButton = false;
+
+  @Input("showRightActionButton")
+  showRightActionButton = false;
 
   @Input("status")
   status = 1;
@@ -56,10 +59,13 @@ export class DifferentiateTree implements OnInit{
 		}
   }
 
-  undo(child) {
-    this.onrevert.emit(child);
+  advanceToRightSide(child) {
+    this.onrevert.emit({type:"advance", node: child});
   }
-  revert(event) {
+  advanceToLeftSide(child) {
+    this.onrevert.emit({type:"revert", node: child});
+  }
+  advance(event) {
     // bubble up the undo event.
     this.onrevert.emit(event);
   }
