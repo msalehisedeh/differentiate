@@ -1,38 +1,45 @@
 # Welcome to Differentiate Objects!
 
 Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to clearly see what is changed on either objects on the fly while they change?
-Have you ever wished for ability to merge the two JSON objects as well?
+Have you ever wished for ability to merge the two JSON objects as well? Have you looked for something that is visually appealing as well?
 Would you like to know how it can be done? Would you like to have it done without writing code for it? Take a look at the demo and enjoy the ride.
 
 Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
 
 **NOTE:** Version 1.5.0 is the latest version compatible with Angular 2+, 4+, or 5+.
 
-**NOTE:** Version 2.0.0 is the first version compatible with Angular 6+.
+**NOTE:** Version 2.0.0 is the first version compatible with Angular 6+. I tried my demo project with 6+ version of this library while project is still Angular 5 based without facing any issues.
 
+**I appreciate comments and requests.** please go to provided link and make your comments.
 
 [Live Demo](https://diffrenciate.stackblitz.io) | [Source code](https://github.com/msalehisedeh/differentiate/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
 
 
 ## Attributes
-| Attribute                |Description                                         |
-|--------------------------|----------------------------------------------------|
+| Attribute                |Description                                                                                                                |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------|
 |allowRevert               |Will allow user to revert any one of the changed attributes/values found on right hand-side to be same as left hand-side.  |
 |allowAdvance              |Will allow user to revert any one of the changed attributes/values found on left hand-side to be same as right hand-side.  |
-|leftSideObject            |JSON Object on left-hand side to be differentiated.  |
-|rightSideObject           |JSON Object on right-hand side to be differentiated. |
-|onlyShowDifferences       |If set, will ignore all attributes in JSON hierarchy which are not changed. |
-|attributeOrderIsImportant |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy. |
+|leftSideObject            |JSON Object on left-hand side to be differentiated.                                                                        |
+|rightSideObject           |JSON Object on right-hand side to be differentiated.                                                                       |
+|onlyShowDifferences       |If set, will ignore all attributes in JSON hierarchy which are not changed.                                                |
+|attributeOrderIsImportant |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy.  |
 
 ## Events
-| Event                |Description                                     |
-|----------------------|------------------------------------------------|
-|onrevert              |Will be fired when any one of changed items on left hand-side should replace or push to the right hand-side item.    |
-|onadvance             |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item.    |
+| Event                    |Description                                                                                                                |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------|
+|onrevert                  |Will be fired when any one of changed items on left hand-side should replace or push to the right hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
+|onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
 
+
+# Version 2.1.1
+Fixed minor issues. You definitely need to upgrade to this version. Also, I found something that I want to report.  I was under impression that Angular 6 is not compatible with 2,4,5. However, for the demo, I upgraded the differentiate demo on stackblitz.io and kept angular 5 library. 
+It is still working fine. so, just in case, if you decide to use the latest version of this library with your Angular 5 project, try it out. and see if it works wor you.
 
 # Version 2.1.0
-Made the delay a bit more extended to get a feeling of something is being done and i think it makes it look performing. Also made the differentiate library being able to fullty merge two sides by adding a **onadvance** event.  I wanted to change the onrevert action to something more appropriate but I decided to keep it just incase someone is already using the action already.
+Made the spinner delay a bit more extended to create a feeling that something is being done and I think it makes it look performing. 
+Also added ability to fully merge left and right sides interchangeably by adding a **onadvance** event.  I wanted to change the onrevert action to something more appropriate but I decided to keep it just in case someone is already using the action already.
+I suggest you update your references when the events are fired and then provide a submit button to save the JSON objects in one shot when user is ready.
 
 # Version 2.0.1
 To create impression of performance when comparing large size JSON objects, made the process non-blocking and added a wait spinner.
@@ -70,16 +77,17 @@ in your html:
 ```javascript
 	<differentiate 
 		onlyShowDifferences="true"
-    attributeOrderIsImportant="true"
-    allowRevert="true"
-    allowAdvance="true"
-    (onrevert)="revert($event)"
-    (onadvance)="advance($event)"
+		attributeOrderIsImportant="true"
+		allowRevert="true"
+		allowAdvance="true"
+		(onrevert)="revert($event)"
+		(onadvance)="advance($event)"
 		[leftSideObject]="leftJSONtree" 
 		[rightSideObject]="rightJSONtree"></differentiate>
 ```
 
-Initiate / create both **leftJSONtree** and **rightJSONtree** in your component. If at any time one of the objects updated, Differentiate  re-evaluate and displayed the difference immediately.
+Initiate / create both **leftJSONtree** and **rightJSONtree** in your component. 
+If at any time one of the objects updated, Differentiate  re-evaluate and displayed the difference immediately.
 
 Include the **DifferentiateModule** module in your App module.
 ```javascript

@@ -69,36 +69,38 @@ class DifferentiateComponent {
         /** @type {?} */
         let array = [];
         node.map((item) => {
-            if (parent === DifferentiateNodeType.json) {
-                if (item.type === DifferentiateNodeType.literal) {
-                    array.push(item.value);
-                }
-                else if (item.type === DifferentiateNodeType.pair) {
-                    json[item.name] = item.value;
-                }
-                else if (item.type === DifferentiateNodeType.array) {
-                    /** @type {?} */
-                    const x = this.transformNodeToOriginalStructure(item.children, item.parent);
-                    if (item.name.length) {
-                        json[item.name] = x;
+            if (item.status !== DifferentiateNodeStatus.removed) {
+                if (parent === DifferentiateNodeType.json) {
+                    if (item.type === DifferentiateNodeType.literal) {
+                        array.push(item.value);
                     }
-                    else {
-                        json = [x];
+                    else if (item.type === DifferentiateNodeType.pair) {
+                        json[item.name] = item.value;
+                    }
+                    else if (item.type === DifferentiateNodeType.array) {
+                        /** @type {?} */
+                        const x = this.transformNodeToOriginalStructure(item.children, item.parent);
+                        if (item.name.length) {
+                            json[item.name] = x;
+                        }
+                        else {
+                            json = [x];
+                        }
+                    }
+                    else if (item.type === DifferentiateNodeType.json) {
+                        json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
                     }
                 }
-                else if (item.type === DifferentiateNodeType.json) {
-                    json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
-                }
-            }
-            else if (parent === DifferentiateNodeType.array) {
-                if (item.type === DifferentiateNodeType.literal) {
-                    array.push(item.value);
-                }
-                else if (item.type === DifferentiateNodeType.json) {
-                    array.push(this.transformNodeToOriginalStructure(item, item.parent));
-                }
-                else if (item.type === DifferentiateNodeType.array) {
-                    array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+                else if (parent === DifferentiateNodeType.array) {
+                    if (item.type === DifferentiateNodeType.literal) {
+                        array.push(item.value);
+                    }
+                    else if (item.type === DifferentiateNodeType.json) {
+                        array.push(this.transformNodeToOriginalStructure(item, item.parent));
+                    }
+                    else if (item.type === DifferentiateNodeType.array) {
+                        array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+                    }
                 }
             }
         });
@@ -522,9 +524,11 @@ class DifferentiateComponent {
             this.ngOnInit();
         }
         if (changes.leftSideObject) {
+            this.ready = false;
             this.ngOnInit();
         }
         if (changes.rightSideObject) {
+            this.ready = false;
             this.ngOnInit();
         }
     }
@@ -757,7 +761,7 @@ DifferentiateComponent.decorators = [
     [children]="rightSide"></differentiate-tree>
 
 `,
-                styles: [`:host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;min-height:100px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top;position:absolute;top:0;left:10%}:host svg path,:host svg rect{fill:#1c0696}`],
+                styles: [`:host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;min-height:100px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top;position:absolute;top:0;left:10%;z-index:2}:host svg path,:host svg rect{fill:#1c0696}`],
             },] },
 ];
 /** @nocollapse */

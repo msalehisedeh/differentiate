@@ -44,35 +44,37 @@ var DifferentiateComponent = /** @class */ (function () {
         var json = {};
         var array = [];
         node.map(function (item) {
-            if (parent === DifferentiateNodeType.json) {
-                if (item.type === DifferentiateNodeType.literal) {
-                    array.push(item.value);
-                }
-                else if (item.type === DifferentiateNodeType.pair) {
-                    json[item.name] = item.value;
-                }
-                else if (item.type === DifferentiateNodeType.array) {
-                    var x = _this.transformNodeToOriginalStructure(item.children, item.parent);
-                    if (item.name.length) {
-                        json[item.name] = x;
+            if (item.status !== DifferentiateNodeStatus.removed) {
+                if (parent === DifferentiateNodeType.json) {
+                    if (item.type === DifferentiateNodeType.literal) {
+                        array.push(item.value);
                     }
-                    else {
-                        json = [x];
+                    else if (item.type === DifferentiateNodeType.pair) {
+                        json[item.name] = item.value;
+                    }
+                    else if (item.type === DifferentiateNodeType.array) {
+                        var x = _this.transformNodeToOriginalStructure(item.children, item.parent);
+                        if (item.name.length) {
+                            json[item.name] = x;
+                        }
+                        else {
+                            json = [x];
+                        }
+                    }
+                    else if (item.type === DifferentiateNodeType.json) {
+                        json[item.name] = _this.transformNodeToOriginalStructure(item.children, item.parent);
                     }
                 }
-                else if (item.type === DifferentiateNodeType.json) {
-                    json[item.name] = _this.transformNodeToOriginalStructure(item.children, item.parent);
-                }
-            }
-            else if (parent === DifferentiateNodeType.array) {
-                if (item.type === DifferentiateNodeType.literal) {
-                    array.push(item.value);
-                }
-                else if (item.type === DifferentiateNodeType.json) {
-                    array.push(_this.transformNodeToOriginalStructure(item, item.parent));
-                }
-                else if (item.type === DifferentiateNodeType.array) {
-                    array.push(_this.transformNodeToOriginalStructure(item.children, item.parent));
+                else if (parent === DifferentiateNodeType.array) {
+                    if (item.type === DifferentiateNodeType.literal) {
+                        array.push(item.value);
+                    }
+                    else if (item.type === DifferentiateNodeType.json) {
+                        array.push(_this.transformNodeToOriginalStructure(item, item.parent));
+                    }
+                    else if (item.type === DifferentiateNodeType.array) {
+                        array.push(_this.transformNodeToOriginalStructure(item.children, item.parent));
+                    }
                 }
             }
         });
@@ -425,9 +427,11 @@ var DifferentiateComponent = /** @class */ (function () {
             this.ngOnInit();
         }
         if (changes.leftSideObject) {
+            this.ready = false;
             this.ngOnInit();
         }
         if (changes.rightSideObject) {
+            this.ready = false;
             this.ngOnInit();
         }
     };
@@ -587,7 +591,7 @@ DifferentiateComponent.decorators = [
     { type: Component, args: [{
                 selector: 'differentiate',
                 template: "<div class=\"spinner\" *ngIf=\"!ready\">\n    <svg \n        version=\"1.1\" \n        id=\"loader\" \n        xmlns=\"http://www.w3.org/2000/svg\" \n        xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n        x=\"0px\" \n        y=\"0px\"\n        width=\"40px\" \n        height=\"40px\" \n        viewBox=\"0 0 50 50\" \n        style=\"enable-background:new 0 0 50 50;\" \n        xml:space=\"preserve\">\n        <path \n            fill=\"#000\" \n            d=\"M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z\">\n            <animateTransform attributeType=\"xml\"\n                attributeName=\"transform\"\n                type=\"rotate\"\n                from=\"0 25 25\"\n                to=\"360 25 25\"\n                dur=\"0.6s\"\n                repeatCount=\"indefinite\"/>\n    </path>\n  </svg>\n</div>\n<differentiate-tree \n    *ngIf=\"leftSide && rightSide\"\n    class=\"root\" \n    level=\"0\" \n    side=\"left-side\" \n    (onhover)=\"onhover($event)\"\n    (onrevert)=\"advance($event)\"\n    [showLeftActionButton]=\"allowAdvance\" \n    [children]=\"leftSide\"></differentiate-tree>\n<differentiate-tree \n    *ngIf=\"leftSide && rightSide\"\n    class=\"root\" \n    level=\"0\" \n    side=\"right-side\" \n    (onhover)=\"onhover($event)\"\n    (onrevert)=\"advance($event)\"\n    [showRightActionButton]=\"allowRevert\" \n    [children]=\"rightSide\"></differentiate-tree>\n\n",
-                styles: [":host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;min-height:100px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top;position:absolute;top:0;left:10%}:host svg path,:host svg rect{fill:#1c0696}"],
+                styles: [":host{border:1px solid #444;-webkit-box-sizing:border-box;box-sizing:border-box;display:block;max-width:100vw;max-height:300px;min-height:100px;overflow-y:auto;position:relative;width:100%}:host .spinner{margin:0 auto 1em;height:100px;width:20%;text-align:center;padding:1em;display:inline-block;vertical-align:top;position:absolute;top:0;left:10%;z-index:2}:host svg path,:host svg rect{fill:#1c0696}"],
             },] },
 ];
 DifferentiateComponent.ctorParameters = function () { return []; };

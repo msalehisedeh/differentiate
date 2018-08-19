@@ -65,28 +65,30 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     let array = [];
 
     node.map( (item: DifferentiateNode) => {
-      if (parent === DifferentiateNodeType.json) {        
-        if (item.type === DifferentiateNodeType.literal) {
-          array.push(item.value);
-        } else if (item.type === DifferentiateNodeType.pair) {
-          json[item.name] = item.value;
-        } else if (item.type === DifferentiateNodeType.array) {
-          const x = this.transformNodeToOriginalStructure(item.children, item.parent);
-          if (item.name.length) {
-            json[item.name] = x;
-          } else {
-            json = [x];
+      if (item.status !== DifferentiateNodeStatus.removed) {
+        if (parent === DifferentiateNodeType.json) {    
+          if (item.type === DifferentiateNodeType.literal) {
+            array.push(item.value);
+          } else if (item.type === DifferentiateNodeType.pair) {
+            json[item.name] = item.value;
+          } else if (item.type === DifferentiateNodeType.array) {
+            const x = this.transformNodeToOriginalStructure(item.children, item.parent);
+            if (item.name.length) {
+              json[item.name] = x;
+            } else {
+              json = [x];
+            }
+          } else if (item.type === DifferentiateNodeType.json) {
+            json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
           }
-        } else if (item.type === DifferentiateNodeType.json) {
-          json[item.name] = this.transformNodeToOriginalStructure(item.children, item.parent);
-        }
-      } else if (parent === DifferentiateNodeType.array){
-        if (item.type === DifferentiateNodeType.literal) {
-          array.push(item.value);
-        } else if (item.type === DifferentiateNodeType.json) {
-          array.push(this.transformNodeToOriginalStructure(item, item.parent));
-        } else if (item.type === DifferentiateNodeType.array) {
-          array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+        } else if (parent === DifferentiateNodeType.array){
+          if (item.type === DifferentiateNodeType.literal) {
+            array.push(item.value);
+          } else if (item.type === DifferentiateNodeType.json) {
+            array.push(this.transformNodeToOriginalStructure(item, item.parent));
+          } else if (item.type === DifferentiateNodeType.array) {
+            array.push(this.transformNodeToOriginalStructure(item.children, item.parent));
+          }
         }
       }
     });
@@ -425,9 +427,11 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       this.ngOnInit();
     }
     if (changes.leftSideObject) {
+      this.ready = false;
       this.ngOnInit();
     }
     if (changes.rightSideObject) {
+      this.ready = false;
       this.ngOnInit();
     }
   }
