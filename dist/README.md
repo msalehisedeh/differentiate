@@ -30,7 +30,11 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------|
 |onrevert                  |Will be fired when any one of changed items on left hand-side should replace or push to the right hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
 |onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
+|ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
+
+# Version 2.1.3
+Added **ondifference** event. I realized there is a need to display messages or hide action buttons if there are differences between two JSON objects. As a result, immediately after a comparission performed, this event is fired.
 
 # Version 2.1.1
 Fixed minor issues. You definitely need to upgrade to this version. Also, I found something that I want to report.  I was under impression that Angular 6 is not compatible with 2,4,5. However, for the demo, I upgraded the differentiate demo on stackblitz.io and kept angular 5 library. 
@@ -39,7 +43,9 @@ It is still working fine. so, just in case, if you decide to use the latest vers
 # Version 2.1.0
 Made the spinner delay a bit more extended to create a feeling that something is being done and I think it makes it look performing. 
 Also added ability to fully merge left and right sides interchangeably by adding a **onadvance** event.  I wanted to change the onrevert action to something more appropriate but I decided to keep it just in case someone is already using the action already.
-I suggest you update your references when the events are fired and then provide a submit button to save the JSON objects in one shot when user is ready.
+I suggest you update your references when the events are fired and then provide a submit button to save the JSON objects in one shot when user is ready. 
+
+Keep in mind, if you set the flag to only see the differences, the json sent to you in onadvance or onrevert is the subset items. As a result you would need to infuse the items sent to you in your local copy.
 
 # Version 2.0.1
 To create impression of performance when comparing large size JSON objects, made the process non-blocking and added a wait spinner.
@@ -88,6 +94,16 @@ in your html:
 
 Initiate / create both **leftJSONtree** and **rightJSONtree** in your component. 
 If at any time one of the objects updated, Differentiate  re-evaluate and displayed the difference immediately.
+
+To handle onrevert or onadvance events, you need to do something like this
+```javascript
+	revert(event) {
+		Object.keys(event).map( (key) => {
+			this.myLocalCopyOfJsonOnRightside[key] = event[key];
+		});
+	}
+```
+
 
 Include the **DifferentiateModule** module in your App module.
 ```javascript

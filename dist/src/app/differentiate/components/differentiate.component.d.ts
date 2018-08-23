@@ -11,6 +11,7 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     rightSideObject: any;
     onrevert: EventEmitter<{}>;
     onadvance: EventEmitter<{}>;
+    ondifference: EventEmitter<{}>;
     constructor();
     private generateNodeId;
     private transformNodeToOriginalStructure;

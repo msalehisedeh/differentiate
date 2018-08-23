@@ -156,4 +156,7 @@ export class AppComponent {
   advance(event) {
     console.log("advance", event);
   }
+  ondifference(event){
+    console.log("difference", event);
+  }
 }

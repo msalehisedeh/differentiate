@@ -52,6 +52,9 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   @Output("onadvance")
   onadvance = new EventEmitter();
 
+  @Output("ondifference")
+  ondifference = new EventEmitter();
+
   constructor(	) {
 	  
   }
@@ -463,6 +466,13 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         children: comparision.rightSide
       }];
       setTimeout(()=>{this.ready = true;},333);
+      let count = 0;
+      this.leftSide[0].children.map( (item) => {
+        if(item.status !== DifferentiateNodeStatus.default) {
+          count++;
+        }
+      })
+      this.ondifference.emit(count);
     }
   }
   private lookupChildOf(side, id) {
