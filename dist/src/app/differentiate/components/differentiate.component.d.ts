@@ -9,6 +9,8 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     onlyShowDifferences: boolean;
     leftSideObject: any;
     rightSideObject: any;
+    leftSideToolTip: string;
+    rightSideToolTip: string;
     onrevert: EventEmitter<{}>;
     onadvance: EventEmitter<{}>;
     ondifference: EventEmitter<{}>;
@@ -28,6 +30,7 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     ngOnChanges(changes: any): void;
     ngOnInit(): void;
     private init;
+    private fireCountDifference;
     private lookupChildOf;
     private performAdvanceToRight;
     private performAdvanceToLeft;

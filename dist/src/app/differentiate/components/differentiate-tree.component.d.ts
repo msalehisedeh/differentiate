@@ -7,6 +7,8 @@ export declare class DifferentiateTree implements OnInit {
     status: number;
     side: any;
     level: string;
+    leftSideToolTip: string;
+    rightSideToolTip: string;
     onhover: EventEmitter<{}>;
     onrevert: EventEmitter<{}>;
     ngOnInit(): void;

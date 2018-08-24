@@ -46,6 +46,12 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   @Input("rightSideObject")
   rightSideObject;
 
+  @Input("leftSideToolTip")
+  leftSideToolTip = "take left side";
+
+  @Input("rightSideToolTip")
+  rightSideToolTip = "take right side";
+
   @Output("onrevert")
   onrevert = new EventEmitter();
 
@@ -421,19 +427,10 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes) {
-    if (changes.attributeOrderIsImportant) {
-      this.ready = false;
-      this.ngOnInit();
-    }
-    if (changes.onlyShowDifferences) {
-      this.ready = false;
-      this.ngOnInit();
-    }
-    if (changes.leftSideObject) {
-      this.ready = false;
-      this.ngOnInit();
-    }
-    if (changes.rightSideObject) {
+    if (changes.attributeOrderIsImportant ||
+      changes.onlyShowDifferences ||
+      changes.leftSideObject ||
+      changes.rightSideObject) {
       this.ready = false;
       this.ngOnInit();
     }
@@ -465,15 +462,20 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         isRoot: true,
         children: comparision.rightSide
       }];
-      setTimeout(()=>{this.ready = true;},333);
-      let count = 0;
-      this.leftSide[0].children.map( (item) => {
-        if(item.status !== DifferentiateNodeStatus.default) {
-          count++;
-        }
-      })
-      this.ondifference.emit(count);
+      setTimeout(()=>{
+        this.ready = true;
+        this.fireCountDifference();
+      },333);
     }
+  }
+  private fireCountDifference() {
+    let count = 0;
+    this.leftSide[0].children.map( (item) => {
+      if(item.status !== DifferentiateNodeStatus.default) {
+        count++;
+      }
+    })
+    this.ondifference.emit(count);
   }
   private lookupChildOf(side, id) {
     let foundItem = undefined;
@@ -530,6 +532,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
           DifferentiateNodeType.json
         )
       );
+      this.fireCountDifference();
     }, 66);
   }
   private performAdvanceToLeft(leftSideInfo, rightSideInfo, status) {
@@ -569,6 +572,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
           DifferentiateNodeType.json
         )
       );
+      this.fireCountDifference();
     }, 66);
   }
   advance(event) {

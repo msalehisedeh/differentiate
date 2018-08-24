@@ -31,6 +31,7 @@
     side="left-side" 
     (onhover)="onhover($event)"
     (onrevert)="advance($event)"
+    [rightSideToolTip]="rightSideToolTip"
     [showLeftActionButton]="allowAdvance" 
     [children]="leftSide"></differentiate-tree>
 <differentiate-tree 
@@ -40,6 +41,7 @@
     side="right-side" 
     (onhover)="onhover($event)"
     (onrevert)="advance($event)"
+    [leftSideToolTip]="leftSideToolTip"
     [showRightActionButton]="allowRevert" 
     [children]="rightSide"></differentiate-tree>
 

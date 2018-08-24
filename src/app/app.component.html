@@ -3,6 +3,8 @@
   <h1>
     Welcome to {{ title }}!
   </h1>
+  <span *ngIf="diffCount>0">There are {{diffCount}} changes!!</span>
+  <span *ngIf="diffCount==0">Both files are identical!!</span>
 </div>
 
 <button (click)="sampleJson = undefined;displayEntry = true">Add new JSON in dropdown</button>
@@ -73,6 +75,8 @@
     (onrevert)="revert($event)"
     (onadvance)="advance($event)"
     (ondifference)="ondifference($event)"
+    [leftSideToolTip]="'pull from ' + selectedLeft + ' file'"
+    [rightSideToolTip]="'pull from ' + selectedRight + ' file'"
     [onlyShowDifferences]="onlyShowDifferences"
     [attributeOrderIsImportant]="attributeOrderIsImportant"
     [leftSideObject]="lefttree" 

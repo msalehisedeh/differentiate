@@ -11,7 +11,7 @@
     <div class='tree-node'
         [ngClass]="'depth-' + depth"
         [id] = "child.id">
-      <span title="take right side"
+      <span [title]="rightSideToolTip"
         class="do" 
         tabindex="0"
         aria-hidden="true"
@@ -27,7 +27,7 @@
         [class.string]="depth > 0 && child.value && child.value.length"
         [innerHTML]="child.value ? child.value : '&nbsp;'">
       </span>
-      <span title="take left side"
+      <span [title]="leftSideToolTip"
         class="undo" 
         tabindex="0"
         aria-hidden="true"
@@ -39,7 +39,9 @@
         [level]="depth+1" 
         [status]="child.status" 
         [showLeftActionButton]="showLeftActionButton" 
+        [leftSideToolTip]="leftSideToolTip"
         [showRightActionButton]="showRightActionButton" 
+        [rightSideToolTip]="rightSideToolTip"
         (onhover)="bubleup($event)"
         (onrevert)="advance($event)"
         [class.child-node]="child.parent != 4" 

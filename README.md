@@ -22,6 +22,8 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |allowAdvance              |Will allow user to revert any one of the changed attributes/values found on left hand-side to be same as right hand-side.  |
 |leftSideObject            |JSON Object on left-hand side to be differentiated.                                                                        |
 |rightSideObject           |JSON Object on right-hand side to be differentiated.                                                                       |
+|leftSideToolTip           |Tooltip to be displayed on hover of advance action links.                                                                  |
+|rightSideToolTip          |Tooltip to be displayed on hover of revert action links.                                                                   |
 |onlyShowDifferences       |If set, will ignore all attributes in JSON hierarchy which are not changed.                                                |
 |attributeOrderIsImportant |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy.  |
 
@@ -32,6 +34,10 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
+
+# Version 2.1.4
+Modified code to fire **ondifference** event also when a merge operation occures. As a result, you will be able to update whatever message or action link you may display based on count of differences.
+Also, added two more attributes to allow you feed a better tooltip message over the icons for **onadvance** and **onrevert** action links. 
 
 # Version 2.1.3
 Added **ondifference** event. I realized there is a need to display messages or hide action buttons if there are differences between two JSON objects. As a result, immediately after a comparission performed, this event is fired.
@@ -88,6 +94,8 @@ in your html:
 		allowAdvance="true"
 		(onrevert)="revert($event)"
 		(onadvance)="advance($event)"
+    	[leftSideToolTip]="'pull from ' + selectedLeft + ' file'"
+    	[rightSideToolTip]="'pull from ' + selectedRight + ' file'"
 		[leftSideObject]="leftJSONtree" 
 		[rightSideObject]="rightJSONtree"></differentiate>
 ```

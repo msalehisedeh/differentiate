@@ -37,6 +37,12 @@ export class DifferentiateTree implements OnInit{
   @Input("level")
   level = "0";
 
+  @Input("leftSideToolTip")
+  leftSideToolTip = "take left side";
+
+  @Input("rightSideToolTip")
+  rightSideToolTip = "take right side";
+
   @Output("onhover")
   onhover = new EventEmitter();
 
