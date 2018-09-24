@@ -11,6 +11,8 @@ import {
   EventEmitter
 } from '@angular/core';
 
+import {DifferentiateNodeStatus} from '../interfaces/differentiate.interfaces';
+
 @Component({
   selector: 'differentiate-tree',
   templateUrl: './differentiate-tree.component.html',
@@ -75,6 +77,16 @@ export class DifferentiateTree implements OnInit{
     if (code === 13) {
       event.target.click();
 		}
+  }
+
+  changCounter() {
+    let count = 0;
+    this.children.map( (item) => {
+      if(item.status !== DifferentiateNodeStatus.default) {
+        count++;
+      }
+    })
+    return count;
   }
 
   expand(event) {

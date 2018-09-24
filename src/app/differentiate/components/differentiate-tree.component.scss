@@ -1,6 +1,5 @@
 :host {
   box-sizing: border-box;
-  display: inline-block;
   width: 100%;
 }
 :host.root {
@@ -13,13 +12,26 @@
 .diff-heading {
   padding: 5px;
   font-weight: bold;
-  background-color: #3a3636;
-  border-bottom: 1px solid #aaa;
-  color: #fff;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: #666;
   cursor: pointer;
   .arrow {
+    color: #999;
     font-size: 0.6rem;
     font-weight: bold;
+  }
+  .counter {
+    float: right;
+    border-radius: 50%;
+    border: 1px solid #666;
+    width: 18px;
+    text-align: center;
+    background-color: #666;
+    color: #fff;
+  }
+  &:first-child {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
   }
 }
 ul {
@@ -34,7 +46,7 @@ ul {
 
   li {
     .hover{
-      background-color: #ddd;
+      background-color: rgba(0, 0, 0, 0.1);
     }
     .tree-node {
       position: relative;
@@ -69,14 +81,13 @@ ul {
   &.undefined {
     li {
       &:hover {
-        background-color: #ddd;
+        background-color: rgba(0, 0, 0, 0.1);
       }
     }
   }
 
   &.left-side {
-    border-right: 1px solid #3a3636;
-    display: inline-block;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
     margin: 0;
 
     li {
@@ -252,8 +263,7 @@ ul {
     }   
   }
   &.right-side {
-    border-left: 1px solid #3a3636;
-    display: inline-block;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
     margin: 0;
 
     li {
@@ -424,6 +434,13 @@ ul {
         }
       }
     }    
+  }
+  &.child {
+    margin-top:2px !important;
+    li {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
   }
   
   .tree-node {

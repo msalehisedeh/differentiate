@@ -4,8 +4,9 @@
   <span class="arrow" *ngIf="collapsed">&#9658;</span>
   <span class="arrow" *ngIf="!collapsed">&#9660;</span>
   <span [textContent]="categorizeBy"></span>
+  <span class="counter" [textContent]="changCounter()"></span>
 </div>
-<ul [class]="side" [class.collapsed]="categorizeBy && collapsed">
+<ul [class]="side" [class.child]="depth ===2 || (categorizeBy && categorizeBy.length)" [class.collapsed]="categorizeBy && collapsed">
   <li  *ngFor="let child of children" 
     (mouseout)="mouseOvered(false, child.index)"
     (mouseover)="mouseOvered(true, child.index)"

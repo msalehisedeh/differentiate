@@ -5,15 +5,15 @@
     position: relative;
     margin: 4px 0;
     width: 100%;
-    border: 1px groove #aaa;
-  
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
     select {
       float: left;
       width: 50%;
     }
   }
   .json-wrapper {
-    border: 2px groove #aaa;
+    border: 2px groove rgba(0, 0, 0, 0.1);
     background-color: #eee;
     box-sizing: border-box;
     display: block;
@@ -34,7 +34,7 @@
     }
   }
   .logger {
-    border: 2px groove #aaa;
+    border: 2px groove rgba(0, 0, 0, 0.1);
     background-color: #eee;
     box-sizing: border-box;
     display: inline-block;
@@ -76,7 +76,7 @@
   }
   .pick-points {
     margin: 4px auto;
-    border: 2px groove #aaa;
+    border: 2px groove rgba(0, 0, 0, 0.1);
   }
   #entry {
     width: 97vw;
@@ -127,5 +127,5 @@
   }  
 }
 ::ng-deep differentiate {
-  border: 2px groove #aaa !important;
+  border: 2px groove rgba(0, 0, 0, 0.1) !important;
 }

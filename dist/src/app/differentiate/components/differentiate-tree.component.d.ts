@@ -18,6 +18,7 @@ export declare class DifferentiateTree implements OnInit {
     ngOnInit(): void;
     bubleup(event: any): void;
     keyup(event: any): void;
+    changCounter(): number;
     expand(event: any): void;
     autoExpand(event: any): void;
     advanceToRightSide(child: any): void;
