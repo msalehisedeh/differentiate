@@ -31,6 +31,15 @@
 
 <fieldset class="pick-points">
   <legend>Options:</legend>
+  <label for="rootObject">Name Root Object:</label>
+  <input 
+      type="text" 
+      title="Comma separated String attributes of root object"
+      placeholder="id,firstname"
+      [value]="namedRootObjectTemp" 
+      (keyup)="textkeyup($event)"
+      (input)="namedRootObjectTemp = $event.target.value;"  />
+
   <label for="option1">
       <input 
           type="checkbox" 
@@ -43,16 +52,16 @@
       <span>Attribute Order Is Important</span>
   </label>   
   <label for="option2">
-      <input 
-          type="checkbox" 
-          name="option2" 
-          id="option2" 
-          [value]="onlyShowDifferences" 
-          [checked]="onlyShowDifferences ? true: null" 
-          (keyup)="keyup($event)"
-          (click)="click($event, 'onlyShowDifferences')" /> 
-      <span>Only Show Differences</span>
-  </label>   
+    <input 
+        type="checkbox" 
+        name="option2" 
+        id="option2" 
+        [value]="onlyShowDifferences" 
+        [checked]="onlyShowDifferences ? true: null" 
+        (keyup)="keyup($event)"
+        (click)="click($event, 'onlyShowDifferences')" /> 
+    <span>Only Show Differences</span>
+</label>   
 </fieldset>
 
 <div class="selection-wrapper">
@@ -67,7 +76,7 @@
             [value]="option" 
             [selected]="selectedRight===option"
             [textContent]="option"></option>
-  </select>
+  </select> 
 </div>
 <differentiate 
     allowRevert="true"
@@ -75,6 +84,7 @@
     (onrevert)="revert($event)"
     (onadvance)="advance($event)"
     (ondifference)="ondifference($event)"
+    [namedRootObject]="namedRootObject"
     [leftSideToolTip]="'pull from ' + selectedLeft + ' file'"
     [rightSideToolTip]="'pull from ' + selectedRight + ' file'"
     [onlyShowDifferences]="onlyShowDifferences"
@@ -87,6 +97,6 @@
   <div class="json-view right" [innerHTML]="righttree | json"></div>  
 </div>
 
-<ul class="json-view">
-  <li [innerHTML]="action" *ngFor="let action of actions"></li>
+<ul class="logger">
+  <li [innerHTML]="action | json" *ngFor="let action of actions"></li>
 </ul>

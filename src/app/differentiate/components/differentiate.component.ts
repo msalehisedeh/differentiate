@@ -16,6 +16,7 @@ import {
   DifferentiateNodeType,
   DifferentiateNodeStatus
 } from '../interfaces/differentiate.interfaces';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'differentiate',
@@ -27,6 +28,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   leftSide;
   rightSide;
   ready: boolean;
+  categorizeBy: string[];
 
   @Input("allowRevert")
   allowRevert = false;
@@ -51,6 +53,17 @@ export class DifferentiateComponent implements OnInit, OnChanges {
 
   @Input("rightSideToolTip")
   rightSideToolTip = "take right side";
+
+  @Input('namedRootObject')
+  set namedRootObject(value: string) {
+    let x = value.replace(" ", "");
+
+    if (x.length) {
+      this.categorizeBy = value.split(",");
+    } else {
+      this.categorizeBy = undefined;
+    }
+  }
 
   @Output("onrevert")
   onrevert = new EventEmitter();
@@ -430,6 +443,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     if (changes.attributeOrderIsImportant ||
       changes.onlyShowDifferences ||
       changes.leftSideObject ||
+      changes.namedRootObject ||
       changes.rightSideObject) {
       this.ready = false;
       this.ngOnInit();
@@ -439,13 +453,42 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   ngOnInit() {
     setTimeout(()=>this.init(),666);
   }
+  private categorizedName(item) {
+    let name = "";
+    this.categorizeBy.map((category) => {
+      if (item.name === category) {
+        name = item.value;
+      }
+    });
+    return name;
+  }
+  private sideCategorizedName(side) {
+    side.map( (item) => {
+      const names = [];
+      item.children.map((child) => {
+        const name = this.categorizedName(child);
+        if(String(name).length) {
+          names.push(name);
+        }
+      });
+      item.categorizeBy = names.length > 1 ? names.join(" - ") : names[0];
+      item.collapsed = true;
+    });
+  }
   private init() {
     if (this.leftSideObject && this.rightSideObject) {
-      const comparision = this.toInternalStruction(this.leftSideObject, this.rightSideObject);
+      const left = (this.leftSideObject instanceof Array)  ? this.leftSideObject : [this.leftSideObject]
+      const right = (this.rightSideObject instanceof Array)  ? this.rightSideObject : [this.rightSideObject]
+      const comparision = this.toInternalStruction(left, right);
+      if (this.categorizeBy) {
+        this.sideCategorizedName(comparision.leftSide);
+        this.sideCategorizedName(comparision.rightSide);
+      }  
       this.leftSide = [{
         id: this.generateNodeId(),
         name: "",
         value: "Root",
+        index: 0,
         parent: DifferentiateNodeType.array,
         type: DifferentiateNodeType.array,
         expanded: true,
@@ -456,6 +499,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         id: this.generateNodeId(),
         name: "",
         value: "Root",
+        index: 0,
         parent: DifferentiateNodeType.array,
         type: DifferentiateNodeType.array,
         expanded: true,
@@ -495,7 +539,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     }
     return foundItem;
   }
-  private performAdvanceToRight(leftSideInfo, rightSideInfo, status) {
+  private performAdvanceToRight(leftSideInfo, rightSideInfo, status, index) {
     if (status === DifferentiateNodeStatus.removed) {
       leftSideInfo.node.status = DifferentiateNodeStatus.default;
       rightSideInfo.node.status = DifferentiateNodeStatus.default;
@@ -528,14 +572,14 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     setTimeout(() =>{
       this.onadvance.emit(
         this.transformNodeToOriginalStructure(
-          this.leftSide[0].children, 
+          this.leftSide[0].children[index].children, 
           DifferentiateNodeType.json
         )
       );
       this.fireCountDifference();
     }, 66);
   }
-  private performAdvanceToLeft(leftSideInfo, rightSideInfo, status) {
+  private performAdvanceToLeft(leftSideInfo, rightSideInfo, status, index) {
     if (status === DifferentiateNodeStatus.added) {
       leftSideInfo.node.status = DifferentiateNodeStatus.default;
       rightSideInfo.node.status = DifferentiateNodeStatus.default;
@@ -568,7 +612,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     setTimeout(() =>{
       this.onrevert.emit(
         this.transformNodeToOriginalStructure(
-          this.rightSide[0].children, 
+          this.rightSide[0].children[index].children, 
           DifferentiateNodeType.json
         )
       );
@@ -576,27 +620,35 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     }, 66);
   }
   advance(event) {
+    const path = event.node.path.split(",")
     if (event.type === 'advance') {
       this.performAdvanceToLeft(
-        this.lookupChildOf(this.leftSide[0], event.node.id), 
-        this.lookupChildOf(this.rightSide[0], event.node.counterpart), 
-        event.node.status);
+        this.lookupChildOf(this.leftSide[0].children[parseInt(path[1])], event.node.id), 
+        this.lookupChildOf(this.rightSide[0].children[parseInt(path[1])], event.node.counterpart), 
+        event.node.status, parseInt(path[1]));
     } else {
       this.performAdvanceToRight(
-        this.lookupChildOf(this.leftSide[0], event.node.counterpart), 
-        this.lookupChildOf(this.rightSide[0], event.node.id), 
-        event.node.status);
+        this.lookupChildOf(this.leftSide[0].children[parseInt(path[1])], event.node.counterpart), 
+        this.lookupChildOf(this.rightSide[0].children[parseInt(path[1])], event.node.id), 
+        event.node.status, parseInt(path[1]));
     }
+  }
+  autoExpand(event) {
+    let child;
+    const path = event.split(",")
+    const lc = this.rightSide[0].children[parseInt(path[1])];
+    const rc = this.leftSide[0].children[parseInt(path[1])];
+    
+    lc.collapsed = !lc.collapsed;
+    rc.collapsed = !rc.collapsed;
   }
   onhover(event) {
     let children;
-    if (event.side == 'left-side') {
-      children = this.rightSide[0].children;
-    } else {
-      children = this.leftSide[0].children;
-    }
-    if (children.length > event.index) {
-      children[event.index].hover = event.hover;
-    }
+    const path = event.path.split(",")
+    const lc = this.rightSide[0].children[parseInt(path[1])].children;
+    const rc = this.leftSide[0].children[parseInt(path[1])].children;
+
+    lc[event.index].hover = event.hover;
+    rc[event.index].hover = event.hover;
   }
 }

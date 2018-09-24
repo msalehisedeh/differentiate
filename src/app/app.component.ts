@@ -15,6 +15,8 @@ export class AppComponent {
   error = undefined;
   save = false;
   counter = 1;
+  namedRootObjectTemp = "";
+  namedRootObject = "";
   selectedIndex = 0;
   selectedLeft;
   selectedRight;
@@ -24,7 +26,7 @@ export class AppComponent {
   sample: any;
   expectedActions = ["fa fa-undo","fa fa-save"];
   samplers = {
-    "Sample One": {
+    "Sample One": [{
       id: 1,
       occupation: "engineer",
       firstname: "masoud",
@@ -40,7 +42,23 @@ export class AppComponent {
         ]
       ]
     },
-    "Sample Two": {
+    {
+      id: 2,
+      occupation: "composer",
+      firstname: "daniel",
+      lastname: "salehi",
+      address: {
+        street: "545 beverly dr",
+        city: "Los Angeles",
+        countries: ["US","BS","CS"]
+      },
+      data: [
+        [
+          "Good things are here!"
+        ]
+      ]
+    }],
+    "Sample Two": [{
       id: 2,
       firstname: "neeku",
       lastname: "salehi",
@@ -60,7 +78,22 @@ export class AppComponent {
           "Better Things Yet to Come!"
         ]
       ]
-    },
+    },{
+      id: 3,
+      firstname: "Daniel",
+      lastname: "salehi",
+      age: 50,
+      address: {
+        street: "285 Cristal dr",
+        city: "Los Vegas",
+        countries: ["US","CS"]
+      },
+      methaData: [
+        [
+          "Better Things Yet to Come!"
+        ]
+      ]
+    }],
     "Sample Three": {
       id: 3,
       age: 20,
@@ -114,6 +147,12 @@ export class AppComponent {
     this.sampleJson = event.target.value;
     this.transformToJSON();
   }
+  textkeyup(event) {
+    const code = event.which;
+    if (code === 13) {
+      this.namedRootObject = this.namedRootObjectTemp;
+		}
+  }
   click(event, attr) {
     if (attr === 'attributeOrderIsImportant') {
       this.attributeOrderIsImportant = event.target.checked;
@@ -146,16 +185,16 @@ export class AppComponent {
       const target = event.target;
       target.blur();
       setTimeout(() => {
-        console.log(target, this.sampleJson)
+        // console.log(target, this.sampleJson)
         target.value = this.sampleJson
       },2)
     }
   }
   revert(event) {
-    console.log("revert", event);
+    this.actions.push(event);
   }
   advance(event) {
-    console.log("advance", event);
+    this.actions.push(event);
   }
   ondifference(event){
     this.diffCount = event;

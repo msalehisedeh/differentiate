@@ -1,4 +1,11 @@
-<ul [class]="side">
+<div *ngIf="categorizeBy" 
+  class="diff-heading" 
+  (click)="expand($event)">
+  <span class="arrow" *ngIf="collapsed">&#9658;</span>
+  <span class="arrow" *ngIf="!collapsed">&#9660;</span>
+  <span [textContent]="categorizeBy"></span>
+</div>
+<ul [class]="side" [class.collapsed]="categorizeBy && collapsed">
   <li  *ngFor="let child of children" 
     (mouseout)="mouseOvered(false, child.index)"
     (mouseover)="mouseOvered(true, child.index)"
@@ -38,12 +45,16 @@
     <differentiate-tree *ngIf="child.children.length" 
         [level]="depth+1" 
         [status]="child.status" 
+        [collapsed]="child.collapsed"
+        [categorizeBy]="child.categorizeBy"
         [showLeftActionButton]="showLeftActionButton" 
         [leftSideToolTip]="leftSideToolTip"
         [showRightActionButton]="showRightActionButton" 
         [rightSideToolTip]="rightSideToolTip"
+        [objectPath]="objectPath + (objectPath.length ? ',':'') + child.index"
         (onhover)="bubleup($event)"
         (onrevert)="advance($event)"
+        (onexpand)="autoExpand($event)"
         [class.child-node]="child.parent != 4" 
         [children]='child.children'></differentiate-tree>
     <div class="upper" [ngClass]="'depth-' + depth" *ngIf="child.status > 2"></div>

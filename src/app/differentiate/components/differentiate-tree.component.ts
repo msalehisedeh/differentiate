@@ -19,6 +19,9 @@ import {
 export class DifferentiateTree implements OnInit{
   depth: number;
 
+  @Input("collapsed")
+  collapsed = true;
+
   @Input("children")
   children;
 
@@ -32,10 +35,16 @@ export class DifferentiateTree implements OnInit{
   status = 1;
 
   @Input("side")
-  side;
+  side = "";
 
   @Input("level")
   level = "0";
+
+  @Input("objectPath")
+  objectPath = "";
+
+  @Input("categorizeBy")
+  categorizeBy: string;
 
   @Input("leftSideToolTip")
   leftSideToolTip = "take left side";
@@ -48,6 +57,9 @@ export class DifferentiateTree implements OnInit{
 
   @Output("onrevert")
   onrevert = new EventEmitter();
+
+  @Output("onexpand")
+  onexpand = new EventEmitter();
 
   ngOnInit() {
     this.depth = parseInt(this.level);
@@ -65,10 +77,18 @@ export class DifferentiateTree implements OnInit{
 		}
   }
 
+  expand(event) {
+    this.onexpand.emit( this.objectPath );
+  }
+  autoExpand(event) {
+    this.onexpand.emit(event);
+  }
   advanceToRightSide(child) {
+    child.path = this.objectPath + (this.objectPath.length ? ',':'') + child.index;
     this.onrevert.emit({type:"advance", node: child});
   }
   advanceToLeftSide(child) {
+    child.path = this.objectPath + (this.objectPath.length ? ',':'') + child.index;
     this.onrevert.emit({type:"revert", node: child});
   }
   advance(event) {
@@ -77,11 +97,11 @@ export class DifferentiateTree implements OnInit{
   }
 
   mouseOvered(flag, i) {
-    if (this.depth === 1) {
+    if (this.depth === 2) {
       this.onhover.emit({
         hover: flag,
         index: i,
-        side: this.side
+        path: this.objectPath
       });
     }
   }

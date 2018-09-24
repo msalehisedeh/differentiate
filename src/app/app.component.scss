@@ -33,6 +33,20 @@
       white-space: pre-wrap;
     }
   }
+  .logger {
+    border: 2px groove #aaa;
+    background-color: #eee;
+    box-sizing: border-box;
+    display: inline-block;
+    max-height: 404px;
+    overflow-y: auto;
+    margin-bottom: 45px;
+    width: 100%;
+    margin: 0;
+    li {
+      padding: 3px 0;
+    }
+  }
   .selected {
     font-weight: bold;
     color: red;

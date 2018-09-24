@@ -3,6 +3,7 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     leftSide: any;
     rightSide: any;
     ready: boolean;
+    categorizeBy: string[];
     allowRevert: boolean;
     allowAdvance: boolean;
     attributeOrderIsImportant: boolean;
@@ -11,6 +12,7 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     rightSideObject: any;
     leftSideToolTip: string;
     rightSideToolTip: string;
+    namedRootObject: string;
     onrevert: EventEmitter<{}>;
     onadvance: EventEmitter<{}>;
     ondifference: EventEmitter<{}>;
@@ -29,11 +31,14 @@ export declare class DifferentiateComponent implements OnInit, OnChanges {
     private filterUnchanged;
     ngOnChanges(changes: any): void;
     ngOnInit(): void;
+    private categorizedName;
+    private sideCategorizedName;
     private init;
     private fireCountDifference;
     private lookupChildOf;
     private performAdvanceToRight;
     private performAdvanceToLeft;
     advance(event: any): void;
+    autoExpand(event: any): void;
     onhover(event: any): void;
 }

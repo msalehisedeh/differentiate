@@ -22,6 +22,7 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |allowAdvance              |Will allow user to revert any one of the changed attributes/values found on left hand-side to be same as right hand-side.  |
 |leftSideObject            |JSON Object on left-hand side to be differentiated.                                                                        |
 |rightSideObject           |JSON Object on right-hand side to be differentiated.                                                                       |
+|namedRootObject           |Comma separated list of root object string attributes to identify each object when displaying differences between left and right handsides. |
 |leftSideToolTip           |Tooltip to be displayed on hover of advance action links.                                                                  |
 |rightSideToolTip          |Tooltip to be displayed on hover of revert action links.                                                                   |
 |onlyShowDifferences       |If set, will ignore all attributes in JSON hierarchy which are not changed.                                                |
@@ -34,6 +35,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
+
+# Version 2.2.0
+Added **namedRootObject** attribute to allow for visual separation of differences when a list of objects are supplied. 
 
 # Version 2.1.4
 Modified code to fire **ondifference** event also when a merge operation occures. As a result, you will be able to update whatever message or action link you may display based on count of differences.
