@@ -23,8 +23,8 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |leftSideObject            |Required  |JSON Object on left-hand side to be differentiated.  Default is undefined.                                                                   |
 |rightSideObject           |Required  |JSON Object on right-hand side to be differentiated. Default is undefined.                                                                   |
 |namedRootObject           |Optional  |Comma separated list of object string attributes to identify each root object when displaying differences between left and right hand sides. |
-|leftSideToolTip           |Optional  |Tooltip to be displayed on hover of advance action links. Default is "take left side".                                                       |
-|rightSideToolTip          |Optional  |Tooltip to be displayed on hover of revert action links.  Default is "take left side".                                                       |
+|leftSideToolTip           |Optional  |Tool-tip to be displayed on hover of advance action links. Default is "take left side".                                                       |
+|rightSideToolTip          |Optional  |Tool-tip to be displayed on hover of revert action links.  Default is "take left side".                                                       |
 |onlyShowDifferences       |Optional  |If set, will ignore all attributes in JSON hierarchy which are not changed. Default is false.                                                |
 |attributeOrderIsImportant |Optional  |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy. Default is true.   |
 
@@ -37,10 +37,10 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 
 
 # Version 2.2.4
-Fixed the diff conter **ondifference** event.
+Fixed the diff counter **ondifference** event.
 
 # Version 2.2.3
-This release is mostly for fixing merge issue arised because of changing perspective that input could be a list as opposed to a JSON Object. As a result when you are merging differences, you will need to know the index of merged JSON in the list. Therefore, I had to changed the event is issued. I appologize in advance for inconveniences. **Sorry folks, but you will need to modify code if you are listening to the onadvance and onrevert events.**
+This release is mostly for fixing merge issue arised because of changing perspective that input could be a list as opposed to a JSON Object. As a result when you are merging differences, you will need to know the index of merged JSON in the list. Therefore, I had to changed the event is issued. I apologize in advance for inconveniences. **Sorry folks, but you will need to modify code if you are listening to the onadvance and onrevert events.**
 
 # Version 2.2.2
 Added counter on each object identifier and fixed few exceptions that were raised while merging differences. 
@@ -50,10 +50,10 @@ Added **namedRootObject** attribute to allow for visual separation of difference
 
 # Version 2.1.4
 Modified code to fire **ondifference** event also when a merge operation occures. As a result, you will be able to update whatever message or action link you may display based on count of differences.
-Also, added two more attributes to allow you feed a better tooltip message over the icons for **onadvance** and **onrevert** action links. 
+Also, added two more attributes to allow you feed a better tool-tip message over the icons for **onadvance** and **onrevert** action links. 
 
 # Version 2.1.3
-Added **ondifference** event. I realized there is a need to display messages or hide action buttons if there are differences between two JSON objects. As a result, immediately after a comparission performed, this event is fired.
+Added **ondifference** event. I realized there is a need to display messages or hide action buttons if there are differences between two JSON objects. As a result, immediately after a comparison performed, this event is fired.
 
 # Version 2.1.1
 Fixed minor issues. You definitely need to upgrade to this version. Also, I found something that I want to report.  I was under impression that Angular 6 is not compatible with 2,4,5. However, for the demo, I upgraded the differentiate demo on stackblitz.io and kept angular 5 library. 
