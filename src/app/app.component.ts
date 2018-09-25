@@ -15,8 +15,8 @@ export class AppComponent {
   error = undefined;
   save = false;
   counter = 1;
-  namedRootObjectTemp = "";
-  namedRootObject = "";
+  namedRootObjectTemp = "id,firstname";
+  namedRootObject = "id,firstname";
   selectedIndex = 0;
   selectedLeft;
   selectedRight;

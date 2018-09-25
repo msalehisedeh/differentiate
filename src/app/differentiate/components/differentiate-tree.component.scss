@@ -24,10 +24,10 @@
   .counter {
     float: right;
     border-radius: 50%;
-    border: 1px solid #666;
-    width: 18px;
+    width: 16px;
     text-align: center;
-    background-color: #666;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-size: 0.8rem;
     color: #fff;
   }
   &:first-child {
@@ -40,8 +40,9 @@ ul {
   padding: 0;
   width: 100%;
 
-  &.collapsed {
-    display: none;
+  &.collapsed, 
+   .collapsed {
+    display: none !important;
   }
 
   li {

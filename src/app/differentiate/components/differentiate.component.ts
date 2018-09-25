@@ -539,8 +539,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     } 
     return foundItem;
   }
-  private performAdvanceToRight(leftSideInfo, rightSideInfo, status, index) {
-    const modifiedChildren = this.leftSide[0].children[index].children;
+  private performAdvanceToRight(leftSideInfo, rightSideInfo, status, i) {
+    const modifiedChildren = this.leftSide[0].children[i].children;
     if (status === DifferentiateNodeStatus.removed) {
       leftSideInfo.node.status = DifferentiateNodeStatus.default;
       rightSideInfo.node.status = DifferentiateNodeStatus.default;
@@ -571,14 +571,15 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       leftSideInfo.node.children = rightSideInfo.node.children;
     }
     setTimeout(() =>{
-      this.onadvance.emit(
-        this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
-      );
+      this.onadvance.emit({
+        index: i,
+        node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
+      });
       this.fireCountDifference();
     }, 66);
   }
-  private performAdvanceToLeft(leftSideInfo, rightSideInfo, status, index) {
-    const modifiedChildren = this.rightSide[0].children[index].children;
+  private performAdvanceToLeft(leftSideInfo, rightSideInfo, status, i) {
+    const modifiedChildren = this.rightSide[0].children[i].children;
     if (status === DifferentiateNodeStatus.added) {
       leftSideInfo.node.status = DifferentiateNodeStatus.default;
       rightSideInfo.node.status = DifferentiateNodeStatus.default;
@@ -609,41 +610,40 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       rightSideInfo.node.children = leftSideInfo.node.children;
     }
     setTimeout(() =>{
-      this.onrevert.emit(
-        this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
-      );
+      this.onrevert.emit({
+        index: i,
+        node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
+      });
       this.fireCountDifference();
     }, 66);
   }
   advance(event) {
-    const path = event.node.path.split(",");
+    const index = parseInt(event.node.path.split(",")[1]);
 
     if (event.type === 'advance') {
       this.performAdvanceToLeft(
-        this.lookupChildOf(this.leftSide[0].children[parseInt(path[1])], this.leftSide[0], event.node.id), 
-        this.lookupChildOf(this.rightSide[0].children[parseInt(path[1])], this.rightSide[0], event.node.counterpart), 
-        event.node.status, parseInt(path[1]));
+        this.lookupChildOf(this.leftSide[0].children[index], this.leftSide[0], event.node.id), 
+        this.lookupChildOf(this.rightSide[0].children[index], this.rightSide[0], event.node.counterpart), 
+        event.node.status, index);
     } else {
       this.performAdvanceToRight(
-        this.lookupChildOf(this.leftSide[0].children[parseInt(path[1])], this.leftSide[0], event.node.counterpart), 
-        this.lookupChildOf(this.rightSide[0].children[parseInt(path[1])], this.rightSide[0], event.node.id), 
-        event.node.status, parseInt(path[1]));
+        this.lookupChildOf(this.leftSide[0].children[index], this.leftSide[0], event.node.counterpart), 
+        this.lookupChildOf(this.rightSide[0].children[index], this.rightSide[0], event.node.id), 
+        event.node.status, index);
     }
   }
   autoExpand(event) {
-    let child;
-    const path = event.split(",")
-    const lc = this.rightSide[0].children[parseInt(path[1])];
-    const rc = this.leftSide[0].children[parseInt(path[1])];
+    const index = parseInt(event.split(",")[1]);
+    const lc = this.rightSide[0].children[index];
+    const rc = this.leftSide[0].children[index];
     
     lc.collapsed = !lc.collapsed;
     rc.collapsed = !rc.collapsed;
   }
   onhover(event) {
-    let children;
-    const path = event.path.split(",")
-    const lc = this.rightSide[0].children[parseInt(path[1])].children;
-    const rc = this.leftSide[0].children[parseInt(path[1])].children;
+    const index = parseInt(event.path.split(",")[1]);
+    const lc = this.rightSide[0].children[index].children;
+    const rc = this.leftSide[0].children[index].children;
 
     lc[event.index].hover = event.hover;
     rc[event.index].hover = event.hover;

@@ -31,10 +31,13 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 ## Events
 | Event                    |Description                                                                                                                |
 |--------------------------|---------------------------------------------------------------------------------------------------------------------------|
-|onrevert                  |Will be fired when any one of changed items on left hand-side should replace or push to the right hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
-|onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event is copy of JSON object after being modified to accommodate the request.  |
+|onrevert                  |Will be fired when any one of changed items on left hand-side should replace or push to the right hand-side item. The event has {index,node} structure. Index is the position of node in the input list. The node is copy of JSON object after being modified to accommodate the request. If input is not a list and a JSON object, index will be zero and you can disregard it.  |
+|onadvance                 |Will be fired when any one of changed items on right hand-side should replace or push to the left hand-side item. The event has {index,node} structure. Index is the position of node in the input list. The node is copy of JSON object after being modified to accommodate the request. If input is not a list and a JSON object, index will be zero and you can disregard it.  |
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
+
+# Version 2.2.3
+This release is mostly for fixing merge issue arised because of changing perspective that input could be a list as opposed to a JSON Object. As a result when you are merging differences, you will need to know the index of merged JSON in the list. Therefore, I had to changed the event is issued. I appologize in advance for inconveniences. **Sorry folks, but you will need to modify code if you are listening to the onadvance and onrevert events.**
 
 # Version 2.2.2
 Added counter on each object identifier and fixed few exceptions that were raised while merging differences. 
