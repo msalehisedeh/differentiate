@@ -8,7 +8,6 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'Differentiate Objects';
   actions=[];
-  diffCount = 0;
   onlyShowDifferences = false;
   attributeOrderIsImportant = true;
   displayEntry = false;
@@ -197,6 +196,6 @@ export class AppComponent {
     this.actions.push(event);
   }
   ondifference(event){
-    this.diffCount = event;
+    this.actions.push("Diff count = " + event);
   }
 }

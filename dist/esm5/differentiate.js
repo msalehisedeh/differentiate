@@ -510,10 +510,12 @@ var DifferentiateComponent = /** @class */ (function () {
     };
     DifferentiateComponent.prototype.fireCountDifference = function () {
         var count = 0;
-        this.leftSide[0].children.map(function (item) {
-            if (item.status !== DifferentiateNodeStatus.default) {
-                count++;
-            }
+        this.leftSide[0].children.map(function (listItem) {
+            listItem.children.map(function (item) {
+                if (item.status !== DifferentiateNodeStatus.default) {
+                    count++;
+                }
+            });
         });
         this.ondifference.emit(count);
     };

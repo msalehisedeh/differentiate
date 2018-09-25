@@ -629,10 +629,12 @@ class DifferentiateComponent {
     fireCountDifference() {
         /** @type {?} */
         let count = 0;
-        this.leftSide[0].children.map((item) => {
-            if (item.status !== DifferentiateNodeStatus.default) {
-                count++;
-            }
+        this.leftSide[0].children.map((listItem) => {
+            listItem.children.map((item) => {
+                if (item.status !== DifferentiateNodeStatus.default) {
+                    count++;
+                }
+            });
         });
         this.ondifference.emit(count);
     }

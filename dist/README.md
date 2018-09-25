@@ -36,6 +36,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
+# Version 2.2.4
+Fixed the diff conter **ondifference** event.
+
 # Version 2.2.3
 This release is mostly for fixing merge issue arised because of changing perspective that input could be a list as opposed to a JSON Object. As a result when you are merging differences, you will need to know the index of merged JSON in the list. Therefore, I had to changed the event is issued. I appologize in advance for inconveniences. **Sorry folks, but you will need to modify code if you are listening to the onadvance and onrevert events.**
 
