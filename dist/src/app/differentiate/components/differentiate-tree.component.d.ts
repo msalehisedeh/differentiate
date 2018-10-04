@@ -24,5 +24,5 @@ export declare class DifferentiateTree implements OnInit {
     advanceToRightSide(child: any): void;
     advanceToLeftSide(child: any): void;
     advance(event: any): void;
-    mouseOvered(flag: any, i: any): void;
+    mouseOvered(event: any, flag: any, i: any): void;
 }

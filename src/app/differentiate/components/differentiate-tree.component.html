@@ -8,8 +8,8 @@
 </div>
 <ul [class]="side" [class.child]="depth ===2 || (categorizeBy && categorizeBy.length)" [class.collapsed]="categorizeBy && collapsed">
   <li  *ngFor="let child of children" 
-    (mouseout)="mouseOvered(false, child.index)"
-    (mouseover)="mouseOvered(true, child.index)"
+    (mouseout)="depth === 2 ? mouseOvered($event, false, child.index) : null"
+    (mouseover)="depth === 2 ? mouseOvered($event, true, child.index) : null"
     [class.hover]="child.hover"
     [class.added]="child.status === 5" 
     [class.removed]="child.status === 6" 

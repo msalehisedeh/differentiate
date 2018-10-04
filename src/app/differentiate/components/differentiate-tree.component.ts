@@ -108,8 +108,12 @@ export class DifferentiateTree implements OnInit{
     this.onrevert.emit(event);
   }
 
-  mouseOvered(flag, i) {
+  mouseOvered(event, flag, i) {
+    event.preventDefault();
+
     if (this.depth === 2) {
+      event.stopPropagation();
+      
       this.onhover.emit({
         hover: flag,
         index: i,

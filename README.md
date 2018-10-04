@@ -36,6 +36,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
+# Version 2.2.6
+Fixed the [issue #1](https://github.com/msalehisedeh/differentiate/issues/1) on hover lag for very large objects.
+
 # Version 2.2.4
 Fixed the diff counter **ondifference** event.
 

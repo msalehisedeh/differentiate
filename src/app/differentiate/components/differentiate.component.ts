@@ -644,10 +644,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   }
   onhover(event) {
     const index = parseInt(event.path.split(",")[1]);
-    const lc = this.rightSide[0].children[index].children;
-    const rc = this.leftSide[0].children[index].children;
 
-    lc[event.index].hover = event.hover;
-    rc[event.index].hover = event.hover;
+    this.rightSide[0].children[index].children[event.index].hover = event.hover;
+    this.leftSide[0].children[index].children[event.index].hover = event.hover;
   }
 }

@@ -802,12 +802,8 @@ class DifferentiateComponent {
     onhover(event) {
         /** @type {?} */
         const index = parseInt(event.path.split(",")[1]);
-        /** @type {?} */
-        const lc = this.rightSide[0].children[index].children;
-        /** @type {?} */
-        const rc = this.leftSide[0].children[index].children;
-        lc[event.index].hover = event.hover;
-        rc[event.index].hover = event.hover;
+        this.rightSide[0].children[index].children[event.index].hover = event.hover;
+        this.leftSide[0].children[index].children[event.index].hover = event.hover;
     }
 }
 DifferentiateComponent.decorators = [
@@ -979,12 +975,15 @@ class DifferentiateTree {
         this.onrevert.emit(event);
     }
     /**
+     * @param {?} event
      * @param {?} flag
      * @param {?} i
      * @return {?}
      */
-    mouseOvered(flag, i) {
+    mouseOvered(event, flag, i) {
+        event.preventDefault();
         if (this.depth === 2) {
+            event.stopPropagation();
             this.onhover.emit({
                 hover: flag,
                 index: i,
@@ -1006,8 +1005,8 @@ DifferentiateTree.decorators = [
 </div>
 <ul [class]="side" [class.child]="depth ===2 || (categorizeBy && categorizeBy.length)" [class.collapsed]="categorizeBy && collapsed">
   <li  *ngFor="let child of children" 
-    (mouseout)="mouseOvered(false, child.index)"
-    (mouseover)="mouseOvered(true, child.index)"
+    (mouseout)="depth === 2 ? mouseOvered($event, false, child.index) : null"
+    (mouseover)="depth === 2 ? mouseOvered($event, true, child.index) : null"
     [class.hover]="child.hover"
     [class.added]="child.status === 5" 
     [class.removed]="child.status === 6" 
