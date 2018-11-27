@@ -207,14 +207,14 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   private itemInArray(side: DifferentiateNode[], node: DifferentiateNode) {
     let result: DifferentiateNode;
     const key = node.type === DifferentiateNodeType.literal ?
-                node.value.toUpperCase() :
+                (node.value ? String(node.value).toUpperCase() : "") :
                 node.type === DifferentiateNodeType.array ?
                 node.altName :
                 node.name;
 
     side.map( (item: DifferentiateNode) => {
       if (item.type === DifferentiateNodeType.literal) {
-        if (item.value.toUpperCase() === key) {
+        if (item.value && String(item.value).toUpperCase() === key) {
           result = item;
         }  
       } else if (item.type === DifferentiateNodeType.array) {
@@ -236,13 +236,13 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       return result;
     }
     const key = rightNode.type === DifferentiateNodeType.literal ?
-                    rightNode.value.toUpperCase() :
+                    (rightNode.value ? rightNode.value.toUpperCase() : "") :
                     rightNode.type === DifferentiateNodeType.array ?
                     rightNode.altName :
                     rightNode.name;
 
     if (leftNode.type === DifferentiateNodeType.literal) {
-      if (leftNode.value.toUpperCase() === key) {
+      if (leftNode.value && String(leftNode.value).toUpperCase() === key) {
         result = leftNode;
       }  
     } else if (leftNode.type === DifferentiateNodeType.array) {
