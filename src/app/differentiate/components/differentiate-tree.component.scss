@@ -48,6 +48,9 @@ ul {
   li {
     .hover{
       background-color: rgba(0, 0, 0, 0.1);
+      .do,.undo {
+        text-decoration: underline;
+      }
     }
     .tree-node {
       position: relative;
@@ -57,18 +60,14 @@ ul {
       }
 
       .undo,.do {
-        border-radius: 50%;
-        background-color: #ddd;
         cursor: pointer;
         color: #962323;
-        font-size: 1.2rem;
-        height: 18px;
-        line-height: 1.2rem;
         position: absolute;
         text-align: center;
         top: 0;
         width: 18px;
         z-index: 2;
+        height: 100%;
       }
       .undo {
         right: 0;
@@ -95,6 +94,24 @@ ul {
       position: relative;
       display: table;
       width: 100%;
+
+      .do,.undo {
+        border-right: 1px solid #ddd;
+      }
+      .tree-node {
+        &:before {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 18px;
+          z-index: 1;
+          background: rgba(0, 0, 0, 0.02);
+          height: 100%;
+          border-right: 1px solid #ddd;
+          content: ' ';
+          display: block;
+        }
+      }
 
       &.added {        
         .name, .value {
@@ -272,6 +289,24 @@ ul {
       display: table;
       width: 100%;
 
+      .do,.undo {
+        border-left: 1px solid #ddd;
+      }
+      .tree-node {
+        &:after {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 18px;
+          z-index: 1;
+          background: rgba(0, 0, 0, 0.02);
+          height: 100%;
+          border-left: 1px solid #ddd;
+          content: ' ';
+          display: block;
+        }
+      }
+
       &.added {
         
         .upper {
@@ -435,13 +470,6 @@ ul {
         }
       }
     }    
-  }
-  &.child {
-    margin-top:2px !important;
-    li {
-      padding-top: 2px;
-      padding-bottom: 2px;
-    }
   }
   
   .tree-node {

@@ -36,6 +36,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
+# Version 2.3.2
+Better looking merger buttons on left/right side of JSON objects.
+
 # Version 2.3.1
 Fixed issue #2. Modified code to avoid upper-case call on blank string.
 
