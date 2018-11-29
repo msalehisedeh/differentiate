@@ -49,7 +49,7 @@ ul {
     .hover{
       background-color: rgba(0, 0, 0, 0.1);
       .do,.undo {
-        text-decoration: underline;
+        color: #000 !important;
       }
     }
     .tree-node {
@@ -61,7 +61,7 @@ ul {
 
       .undo,.do {
         cursor: pointer;
-        color: #962323;
+        color: #751e1e ;
         position: absolute;
         text-align: center;
         top: 0;
@@ -95,21 +95,30 @@ ul {
       display: table;
       width: 100%;
 
-      .do,.undo {
+      .do {
         border-right: 1px solid #ddd;
+        font-size: 1.3rem;
+        line-height: 1.3rem;
+        -moz-transform: scale(-1, 1);
+        -webkit-transform: scale(-1, 1);
+        -o-transform: scale(-1, 1);
+        -ms-transform: scale(-1, 1);
+        transform: scale(-1, 1);
       }
       .tree-node {
-        &:before {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 18px;
-          z-index: 1;
-          background: rgba(0, 0, 0, 0.02);
-          height: 100%;
-          border-right: 1px solid #ddd;
-          content: ' ';
-          display: block;
+        &.left-action {
+          &:before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.02);
+            height: 100%;
+            border-right: 1px solid #ddd;
+            content: ' ';
+            display: block;
+          }
         }
       }
 
@@ -289,21 +298,25 @@ ul {
       display: table;
       width: 100%;
 
-      .do,.undo {
+      .undo {
         border-left: 1px solid #ddd;
+        font-size: 1.3rem;
+        line-height: 1.3rem;
       }
       .tree-node {
-        &:after {
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 18px;
-          z-index: 1;
-          background: rgba(0, 0, 0, 0.02);
-          height: 100%;
-          border-left: 1px solid #ddd;
-          content: ' ';
-          display: block;
+        &.right-action {
+          &:after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 18px;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.02);
+            height: 100%;
+            border-left: 1px solid #ddd;
+            content: ' ';
+            display: block;
+          }
         }
       }
 

@@ -10,6 +10,8 @@ export class AppComponent {
   actions=[];
   onlyShowDifferences = false;
   attributeOrderIsImportant = true;
+  enableRevert = true;
+  enableAdvance = true;
   displayEntry = false;
   error = undefined;
   save = false;
@@ -59,9 +61,10 @@ export class AppComponent {
     }],
     "Sample Two": [{
       id: 2,
+      occupation: "",
       firstname: "neeku",
       lastname: "salehi",
-      age: 20,
+      age: undefined,
       address: {
         street: "2345 blagio dr",
         city: "Los Angeles",
@@ -158,6 +161,12 @@ export class AppComponent {
     }
     if (attr === 'onlyShowDifferences') {
       this.onlyShowDifferences = event.target.checked;
+    }
+    if (attr === 'enableRevert') {
+      this.enableRevert = event.target.checked;
+    }
+    if (attr === 'enableAdvance') {
+      this.enableAdvance = event.target.checked;
     }
   }
   addDataEntry(entryName) {

@@ -36,11 +36,14 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
+# Version 2.3.3
+Added visual controls on demo app to show how you can enable/disable left/right side merger controls.
+
 # Version 2.3.2
 Better looking merger buttons on left/right side of JSON objects.
 
 # Version 2.3.1
-Fixed issue #2. Modified code to avoid upper-case call on blank string.
+Fixed [issue #2](https://github.com/msalehisedeh/differentiate/issues/2). Modified code to avoid upper-case call on blank string.
 
 # Version 2.3.0
 It was brought to my attenssion that some users have trouble using this component in their angular 6 environment. Since I had only updated few dependencies when moved to Angular 6, I am thinking dependencies are causing issues. So, for this relase, i am updating all dependencies to what Angular 6 applications are expecting to have. Please let me know if this is fixing or not fixing any issues you are facing.

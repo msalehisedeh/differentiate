@@ -31,7 +31,7 @@
 
 <fieldset class="pick-points">
   <legend>Options:</legend>
-  <label for="rootObject">Name Root Object:</label>
+  <label for="rootObject">Name Root Object:
   <input 
       type="text" 
       title="Comma separated String attributes of root object"
@@ -39,7 +39,7 @@
       [value]="namedRootObjectTemp" 
       (keyup)="textkeyup($event)"
       (input)="namedRootObjectTemp = $event.target.value;"  />
-
+    </label>
   <label for="option1">
       <input 
           type="checkbox" 
@@ -61,6 +61,28 @@
         (keyup)="keyup($event)"
         (click)="click($event, 'onlyShowDifferences')" /> 
     <span>Only Show Differences</span>
+  </label>   
+  <label for="option3">
+    <input 
+        type="checkbox" 
+        name="option3" 
+        id="option3" 
+        [value]="enableRevert" 
+        [checked]="enableRevert ? true: null" 
+        (keyup)="keyup($event)"
+        (click)="click($event, 'enableRevert')" /> 
+    <span>Enable Revert Differences</span>
+  </label>
+  <label for="option4">
+  <input 
+      type="checkbox" 
+      name="option4" 
+      id="option4" 
+      [value]="enableAdvance" 
+      [checked]="enableAdvance ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'enableAdvance')" /> 
+  <span>Enable Advance Differences</span>
 </label>   
 </fieldset>
 
@@ -79,8 +101,8 @@
   </select> 
 </div>
 <differentiate 
-    allowRevert="true"
-    allowAdvance="true"
+    [allowRevert]="enableRevert"
+    [allowAdvance]="enableAdvance"
     (onrevert)="revert($event)"
     (onadvance)="advance($event)"
     (ondifference)="ondifference($event)"
