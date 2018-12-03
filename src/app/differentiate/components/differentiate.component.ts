@@ -304,16 +304,19 @@ export class DifferentiateComponent implements OnInit, OnChanges {
               item: DifferentiateNode,
               index: number,
               status: DifferentiateNodeStatus) {
-    const newItem = JSON.parse(JSON.stringify(item));
-    side.splice(index, 0, newItem);
-    this.reIndex(side);
-
-    item.status = status;
-    newItem.status = status;
-    item.counterpart = newItem.id;
-    newItem.counterpart = item.id;
-    this.setChildrenStatus(item.children, status)
-    this.setChildrenStatus(newItem.children, status)
+    
+    if (item) {
+      const newItem = JSON.parse(JSON.stringify(item));
+      side.splice(index, 0, newItem);
+      this.reIndex(side);
+  
+      item.status = status;
+      newItem.status = status;
+      item.counterpart = newItem.id;
+      newItem.counterpart = item.id;
+      this.setChildrenStatus(item.children, status)
+      this.setChildrenStatus(newItem.children, status)
+    }
   }
   private setChildrenStatus(list, status){
     list.map( (x) => {

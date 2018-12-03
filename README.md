@@ -1,10 +1,13 @@
 # Welcome to Differentiate Objects!
 
-Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to clearly see what is changed on either objects on the fly while they change?
+Have you ever needed to compare two JSON objects and make a determination on what is changed deep in the object hierarchy and be able to clearly 
+see what is changed on either objects on the fly while they change?
 Have you ever wished for ability to merge the two JSON objects as well? Have you looked for something that is visually appealing as well?
 Would you like to know how it can be done? Would you like to have it done without writing code for it? Take a look at the demo and enjoy the ride.
 
-Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy by displaying visual representation of changes on both sides. Add/Remove representation are done through "+" / "-" characters as well as line curves which are displayed differently based on the an attribute depth. Change of value between two name/value pairs are displayed by "~" characters.
+Differentiate is an Angular based code and will interpret changes deep in JSON hierarchy through visual representation of changes on both sides. 
+"+" / "-" characters on left-hand side as well as diverging line curves over a node of an object view represent adding/removing of an attribute or a node.
+"~" characters on left-hand side of a node represent change of value between two name/value pairs.
 
 **NOTE:** Version 1.5.0 is the latest version compatible with Angular 2+, 4+, or 5+.
 
@@ -18,13 +21,13 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 ## Attributes
 | Attribute                |status    |Description                                                                                                                                  |
 |--------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-|allowRevert               |Optional  |Will allow user to revert any one of the changed attributes/values found on right hand-side to be same as left hand-side.  Default is false. |
-|allowAdvance              |Optional  |Will allow user to revert any one of the changed attributes/values found on left hand-side to be same as right hand-side.  Default is false. |
 |leftSideObject            |Required  |JSON Object on left-hand side to be differentiated.  Default is undefined.                                                                   |
 |rightSideObject           |Required  |JSON Object on right-hand side to be differentiated. Default is undefined.                                                                   |
 |namedRootObject           |Optional  |Comma separated list of object string attributes to identify each root object when displaying differences between left and right hand sides. |
-|leftSideToolTip           |Optional  |Tool-tip to be displayed on hover of advance action links. Default is "take left side".                                                       |
-|rightSideToolTip          |Optional  |Tool-tip to be displayed on hover of revert action links.  Default is "take left side".                                                       |
+|allowRevert               |Optional  |Will allow user to revert any one of the changed attributes/values found on right hand-side to be same as left hand-side.  Default is false. |
+|allowAdvance              |Optional  |Will allow user to advance any one of the changed attributes/values found on left hand-side to be same as right hand-side.  Default is false.|
+|leftSideToolTip           |Optional  |Tool-tip to be displayed on hover of advance action links. Default is "take left side".                                                      |
+|rightSideToolTip          |Optional  |Tool-tip to be displayed on hover of revert action links.  Default is "take left side".                                                      |
 |onlyShowDifferences       |Optional  |If set, will ignore all attributes in JSON hierarchy which are not changed. Default is false.                                                |
 |attributeOrderIsImportant |Optional  |If set, will consider change of order as a difference. If not set, will sort all JSON attributes in its object hierarchy. Default is true.   |
 
@@ -36,6 +39,10 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
+# Version 2.3.4
+For the test JSON objects, I was using undefined on one of the test sampler json object whivh
+bought in an understanding of things to be. updated a code to antiicpate undefined nodes/attributes. 
+
 # Version 2.3.3
 Added visual controls on demo app to show how you can enable/disable left/right side merger controls.
 
@@ -46,7 +53,7 @@ Better looking merger buttons on left/right side of JSON objects.
 Fixed [issue #2](https://github.com/msalehisedeh/differentiate/issues/2). Modified code to avoid upper-case call on blank string.
 
 # Version 2.3.0
-It was brought to my attenssion that some users have trouble using this component in their angular 6 environment. Since I had only updated few dependencies when moved to Angular 6, I am thinking dependencies are causing issues. So, for this relase, i am updating all dependencies to what Angular 6 applications are expecting to have. Please let me know if this is fixing or not fixing any issues you are facing.
+It was brought to my attention that some users have trouble using this component in their angular 6 environment. Since I had only updated few dependencies when moved to Angular 6, I am thinking dependencies are causing issues. So, for this release, I am updating all dependencies to what Angular 6 applications are expecting to have. Please let me know if this is fixing or not fixing any issues you are facing.
 
 # Version 2.2.6
 Fixed the [issue #1](https://github.com/msalehisedeh/differentiate/issues/1) on hover lag for very large objects.
@@ -64,7 +71,7 @@ Added counter on each object identifier and fixed few exceptions that were raise
 Added **namedRootObject** attribute to allow for visual separation of differences when left and right entries are lists. 
 
 # Version 2.1.4
-Modified code to fire **ondifference** event also when a merge operation occures. As a result, you will be able to update whatever message or action link you may display based on count of differences.
+Modified code to fire **ondifference** event also when a merge operation occurs. As a result, you will be able to update whatever message or action link you may display based on count of differences.
 Also, added two more attributes to allow you feed a better tool-tip message over the icons for **onadvance** and **onrevert** action links. 
 
 # Version 2.1.3
@@ -72,7 +79,7 @@ Added **ondifference** event. I realized there is a need to display messages or 
 
 # Version 2.1.1
 Fixed minor issues. You definitely need to upgrade to this version. Also, I found something that I want to report.  I was under impression that Angular 6 is not compatible with 2,4,5. However, for the demo, I upgraded the differentiate demo on stackblitz.io and kept angular 5 library. 
-It is still working fine. so, just in case, if you decide to use the latest version of this library with your Angular 5 project, try it out. and see if it works wor you.
+It is still working fine. so, just in case, if you decide to use the latest version of this library with your Angular 5 project, try it out. and see if it works for you.
 
 # Version 2.1.0
 Made the spinner delay a bit more extended to create a feeling that something is being done and I think it makes it look performing. 
@@ -135,9 +142,7 @@ If at any time one of the objects updated, Differentiate  re-evaluate and displa
 To handle onrevert or onadvance events, you need to do something like this
 ```javascript
 	revert(event) {
-		Object.keys(event).map( (key) => {
-			this.myLocalCopyOfJsonOnRightside[key] = event[key];
-		});
+		this.myLocalCopyOfJsonOnRightside[event.index] = event.node;
 	}
 ```
 
