@@ -39,9 +39,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 |ondifference              |Will fire the total difference count after sides are compared. If there is no difference, count will be zero.              |
 
 
-# Version 2.3.4
-For the test JSON objects, I was using undefined on one of the test sampler json object whivh
-bought in an understanding of things to be. updated a code to antiicpate undefined nodes/attributes. 
+# Version 2.3.5
+For the test JSON objects, I was using undefined on one of the nodes in sampler 3 which was causing exception to be thrown 
+in comparison code. updated a code to anticipate undefined nodes/attributes. 
 
 # Version 2.3.3
 Added visual controls on demo app to show how you can enable/disable left/right side merger controls.
