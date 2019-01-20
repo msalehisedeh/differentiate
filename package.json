@@ -1,6 +1,6 @@
 {
-  "name": "differentiate",
-  "version": "2.3.5",
+  "name": "@sedeh/differentiate",
+  "version": "2.4.1",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -11,10 +11,7 @@
   },
   "private": false,
   "keywords": [
-    "angular 2+",
-    "angular 4+",
-    "angular 5+",
-    "angular 6+",
+    "angular",
     "diff",
     "diff tool",
     "JSON",
@@ -41,22 +38,21 @@
     "easy",
     "best"
   ],
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@angular/common": "^6.0.0",
     "@angular/compiler": "^6.0.0",
     "@angular/core": "^6.0.0",
     "core-js": "^2.5.4",
-    "zone.js": "^0.8.26"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "~0.8.0",
+    "zone.js": "^0.8.26",
+    "@angular-devkit/build-angular": "~0.12.2",
     "@angular/cli": "^6.2.6",
     "@angular/compiler-cli": "^6.0.0",
     "@types/node": "^6.0.60",
     "rxjs": "^6.2.2",
     "codelyzer": "~4.5.0",
     "ng-packagr": "^4.4.0",
-    "protractor": "~5.3.0",
+    "protractor": "~5.4.2",
     "ts-node": "~5.0.1",
     "tslint": "~5.7.0",
     "typescript": "~2.7.2"
