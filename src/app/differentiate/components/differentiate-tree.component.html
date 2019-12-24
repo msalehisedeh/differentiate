@@ -34,10 +34,10 @@
         class='name' 
         [innerHTML]="child.name.length ? child.name : '&nbsp;'">
       </span>
-      <span *ngIf='child.value && child.value!=null'
+      <span *ngIf='child.value != undefined && child.value!=null'
         class='value' 
         [class.string]="depth > 0 && child.value && child.value.length"
-        [innerHTML]="child.value ? child.value : '&nbsp;'">
+        [innerHTML]="child.value != undefined  ? ''+child.value : '&nbsp;'">
       </span>
       <span [title]="leftSideToolTip"
         class="undo" 

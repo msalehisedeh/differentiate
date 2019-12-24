@@ -110,6 +110,7 @@ It is that simple..!!
 
 | Version |Description                                                                                                                |
 |---------|---------------------------------------------------------------------------------------------------------------------------|
+|3.0.0    |upgrade to Angular 8                                                                                                       |
 |2.4.1    |fixed dependencies.                                                                                                        |
 |2.4.0    |Re-organizing libraries I am providing. Added scope to the project. From now on Accessing through @sedeh/differentiate.    |
 |2.3.6    |noticed if I set a value to false, then the value is not displayed on diff view. Fixed it. Enjoy.                          |

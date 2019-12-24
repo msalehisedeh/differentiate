@@ -6,7 +6,10 @@
   <span *ngIf="diffCount>0">There are {{diffCount}} changes!!</span>
   <span *ngIf="diffCount==0">Both files are identical!!</span>
 </div>
-
+<div class="resources">
+    <a href="https://www.npmjs.com/package/@sedeh/differentiate">npm install @sedeh/differentiate</a>
+    <p>Tested On Safari, Chrome, Mozilla, and IE11 browsers.</p>
+</div>
 <button (click)="sampleJson = undefined;displayEntry = true">Add new JSON in dropdown</button>
 <div id="entry" *ngIf="displayEntry">
   <div class="heading"><a (click)="displayEntry = false;">X</a></div>

@@ -12,9 +12,9 @@ export declare class DifferentiateTree implements OnInit {
     categorizeBy: string;
     leftSideToolTip: string;
     rightSideToolTip: string;
-    onhover: EventEmitter<{}>;
-    onrevert: EventEmitter<{}>;
-    onexpand: EventEmitter<{}>;
+    onhover: EventEmitter<any>;
+    onrevert: EventEmitter<any>;
+    onexpand: EventEmitter<any>;
     ngOnInit(): void;
     bubleup(event: any): void;
     keyup(event: any): void;
