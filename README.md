@@ -85,7 +85,7 @@ Include the **DifferentiateModule** module in your App module.
 ```javascript
 	import { BrowserModule } from '@angular/platform-browser';
 	import { NgModule } from '@angular/core';
-	import { DifferentiateModule } from 'differentiate';
+	import { DifferentiateModule } from '@sedeh/differentiate';
 
 	import { AppComponent } from './app.component';
 
