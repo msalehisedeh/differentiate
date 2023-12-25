@@ -148,7 +148,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             index: i,
             name: "",
             altName: "" + i,
-            value: jsonValue,
+            value: String(jsonValue),
             parent: p,
             type: DifferentiateNodeType.literal,
             status: DifferentiateNodeStatus.default,
