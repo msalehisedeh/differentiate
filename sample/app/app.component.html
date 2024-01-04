@@ -1,0 +1,170 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to 
+    <span style="color:#FF6666">Diff</span>
+    <span style="color:#339933">eren</span>
+    <span style="color:#6666ff">tiate</span>
+    Objects!
+  </h1>
+  <span *ngIf="diffCount>0">There are {{diffCount}} changes!!</span>
+  <span *ngIf="diffCount==0">Compare JSON files and visualize the difference!!</span>
+</div>
+<div class="resources">
+    <a href="https://www.npmjs.com/package/@sedeh/differentiate">npm install @sedeh/differentiate</a>
+    <p>Tested On Safari, Chrome, Mozilla, and IE11 browsers.</p>
+</div>
+<button class="add-new-item" (click)="sampleJson = undefined;displayEntry = true">Add new JSON in dropdown</button>
+<div id="entry" *ngIf="displayEntry">
+  <div class="heading"><a (click)="displayEntry = false;">X</a></div>
+  
+  <div class="info" *ngIf="!error">Please select a name for your data set it to be added in dropdown. And drop in data and transformation.</div>
+  <div class="alert" *ngIf="error" [textContent]="error"></div>
+  <label for="entryName">Name: <input id="entryName" #entryName /></label>
+  <label for="entryJson" class="wide">
+    Data JSON: 
+    <textarea #sampler
+      id="entryJson" 
+      cols="40" 
+      rows="10" 
+      (keyup)="keyup($event)"
+      (paste)="onDataPaste($event, sampler.value)" 
+      [textContent]="sampleJson | json"></textarea>
+  </label>
+  <button class="submit" (click)="addDataEntry(entryName.value)">
+  Submit
+</button>
+</div>
+
+<fieldset class="pick-points">
+  <legend>Options:</legend>
+  <label for="optionx">
+    <input 
+      type="checkbox" 
+      name="optionx" 
+      id="optionx" 
+      [value]="expandible" 
+      [checked]="expandible ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'expandible')" /> 
+    <span>Expandible</span>
+  </label>  
+  <label *ngIf="expandible" for="rootObject">Name Root Object:
+    <input 
+      type="text" 
+      class="root-object"
+      title="Comma separated String attributes of root object"
+      placeholder="firstname"
+      [value]="namedRootObjectTemp" 
+      (keyup)="textkeyup($event)"
+      (input)="onValueEntered($event)"  />
+  </label>
+  <label for="option0">
+    <input 
+      type="checkbox" 
+      name="option0" 
+      id="option0" 
+      [value]="caseSensitive" 
+      [checked]="caseSensitive ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'caseSensitive')" /> 
+    <span>Case Sensitive</span>
+  </label>  
+  <label for="option1">
+    <input 
+      type="checkbox" 
+      name="option1" 
+      id="option1" 
+      [value]="attributeOrderIsImportant" 
+      [checked]="attributeOrderIsImportant ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'attributeOrderIsImportant')" /> 
+    <span>Attribute Order Is Important</span>
+  </label>   
+  <label for="option2">
+    <input 
+      type="checkbox" 
+      name="option2" 
+      id="option2" 
+      [value]="onlyShowDifferences" 
+      [checked]="onlyShowDifferences ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'onlyShowDifferences')" /> 
+    <span>Only Show Differences</span>
+  </label>   
+  <label for="option3">
+    <input 
+      type="checkbox" 
+      name="option3" 
+      id="option3" 
+      [value]="enableRevert" 
+      [checked]="enableRevert ? true: null" 
+      (keyup)="keyup($event)"
+      (click)="click($event, 'enableRevert')" /> 
+    <span>Enable Revert Differences</span>
+  </label>
+  <label for="option4">
+  <input 
+    type="checkbox" 
+    name="option4" 
+    id="option4" 
+    [value]="enableAdvance" 
+    [checked]="enableAdvance ? true: null" 
+    (keyup)="keyup($event)"
+    (click)="click($event, 'enableAdvance')" /> 
+  <span>Enable Advance Differences</span>
+</label>   
+</fieldset>
+
+<div class="selection-wrapper">
+  <select (change)="leftSideSelection($event)">
+    <option *ngFor="let option of options" 
+      [value]="option" 
+      [selected]="selectedLeft===option"
+      [textContent]="option"></option>
+  </select>
+  <select (change)="leftrightSideSelection($event)">
+    <option *ngFor="let option of options" 
+      [value]="option" 
+      [selected]="selectedRight===option"
+      [textContent]="option"></option>
+  </select> 
+</div>
+
+<differentiate 
+  [class.fixed-height]="!expandible"
+  [allowRevert]="enableRevert"
+  [allowAdvance]="enableAdvance"
+  (onrevert)="revert($event)"
+  (onadvance)="advance($event)"
+  (ondifference)="ondifference($event)"
+  [namedRootObject]="namedRootObject"
+  [caseSensitive]="caseSensitive"
+  [expandible]="expandible"
+  [leftSideToolTip]="'pull from ' + selectedLeft + ' file'"
+  [rightSideToolTip]="'pull from ' + selectedRight + ' file'"
+  [onlyShowDifferences]="onlyShowDifferences"
+  [attributeOrderIsImportant]="attributeOrderIsImportant"
+  [leftSideObject]="lefttree" 
+  [rightSideObject]="righttree"></differentiate>
+    
+<div class="json-wrapper">
+  <div class="json-view left" [innerHTML]="lefttree | json"></div>
+  <div class="json-view right" [innerHTML]="righttree | json"></div>  
+</div>
+
+<ul *ngIf="actions.length" class="logger">
+  <li *ngFor="let action of actions">
+    [{{ action.time }}]: <b>&nbsp;&nbsp;</b>
+    <ng-container *ngIf="(action.added || action.removed  || action.changed); else content">
+      <b class="added">Added:</b> {{ action.added }} <b>&nbsp;&nbsp;&nbsp;</b>
+      <b class="removed">Deleted:</b> {{ action.removed }} <b>&nbsp;&nbsp;&nbsp;</b>
+      <b class="changed">Changed:</b> {{ action.changed }}
+    </ng-container>
+    <ng-template #content>
+      <b class="removed">{{ action.type }} at index: </b> {{ action.index }} <b>&nbsp;&nbsp;&nbsp;</b>
+      <b class="changed">Node:</b> <span *ngFor="let k of keys(action.node)">{{ k }} : {{ evaluate(action.node[k]) }} ,<b>&nbsp;&nbsp;</b></span>
+    </ng-template>
+  </li>
+
+</ul>

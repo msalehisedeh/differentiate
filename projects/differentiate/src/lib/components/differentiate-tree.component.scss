@@ -1,0 +1,552 @@
+:host {
+  box-sizing: border-box;
+  width: 100%;
+}
+:host.root {
+  float: left;
+  width: 50%;
+}
+:host.child-node {
+  float: left;
+}
+.diff-heading {
+  padding: 5px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: #666;
+  cursor: pointer;
+  .arrow {
+    color: #999;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .counter {
+    float: right;
+    border-radius: 50%;
+    width: 16px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-size: 0.8rem;
+    color: #fff;
+  }
+  &:first-child {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+ul {
+  box-sizing: border-box;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+
+  &.collapsed, 
+   .collapsed {
+    display: none !important;
+  }
+
+  li {
+    .hover{
+      background-color: rgba(0, 0, 0, 0.1);
+      .do,.undo {
+        color: #000 !important;
+      }
+    }
+    .tree-node {
+      position: relative;
+
+      &.depth-0 {
+        display: none;
+      }
+
+      .title {
+        display: block;
+        width: 100%;
+      }
+      .undo,.do {
+        cursor: pointer;
+        color: #751e1e ;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        width: 18px;
+        z-index: 2;
+        height: 100%;
+      }
+      .undo {
+        right: 0;
+      }
+      .do {
+        left: 0;
+      }
+    }
+  }
+
+  &.undefined {
+    li {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  &.left-side {
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 0;
+
+    li {
+      position: relative;
+      display: table;
+      width: 100%;
+
+      .do {
+        border-right: 1px solid #ddd;
+        font-size: 1.3rem;
+        line-height: 1.3rem;
+        -moz-transform: scale(-1, 1);
+        -webkit-transform: scale(-1, 1);
+        -o-transform: scale(-1, 1);
+        -ms-transform: scale(-1, 1);
+        transform: scale(-1, 1);
+      }
+      .tree-node {
+        &.left-action {
+          &:before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 18px;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.02);
+            height: 100%;
+            border-right: 1px solid #ddd;
+            content: ' ';
+            display: block;
+          }
+        }
+      }
+
+      &.added {        
+        .name, .value {
+          opacity: 0.2;
+          font-style: italic;
+        }
+        .upper {
+          border-radius: 0 0 100% 0;
+          box-sizing: border-box;
+          height: 50%;
+          position: absolute;
+          pointer-events:none;
+          width: 50%;
+          top: 0;
+          right: 0;
+
+          &.depth-1 {
+            border: 2px solid #245024;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #378637;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #48ad48;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #57d657;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #67fa67;
+            border-top-width: 0;
+            border-left-width: 0;
+          }
+        }
+        .lower {
+          border-radius: 0 100% 0 0;
+          box-sizing: border-box;
+          height: 50%;
+          position: absolute;
+          pointer-events:none;
+          width: 50%;
+          bottom: 0;
+          right: 0;
+          
+          &.depth-1 {
+            border: 2px solid #245024;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #378637;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #48ad48;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #57d657;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #67fa67;
+            border-bottom-width: 0;
+            border-left-width: 0;
+          }
+        }
+      }
+      &.removed {   
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          width: 66px;
+          top: 0;
+          right: 0;
+          pointer-events:none;
+
+          &:after {
+            content: ' - ';
+            float: right;
+            color: red;
+            font-weight: bold;
+            padding-right: 10px;
+            font-size: 1.2rem;
+            line-height: 1.2rem;
+          }
+        }
+        .lower {
+          display: none;
+        }
+        .tree-node {
+          span {
+          }
+        }
+      }
+      &.type-changed {
+        .tree-node {
+          span {
+          }
+        }
+      }
+      &.name-changed {
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          width: 66px;
+          top: 0;
+          right: 0;
+          pointer-events:none;
+
+          &:after {
+            content: ' ~ ';
+            font-weight: bold;
+            color: blue;
+            float: right;
+            padding-right: 10px;
+            font-size: 1.2rem;
+            line-height: 1.2rem;
+          }
+        }
+        .tree-node {
+          .name {
+            color: #000060;
+          }
+        }
+      }
+      &.value-changed {
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          pointer-events:none;
+          width: 66px;
+          top: 0;
+          right: 0;
+
+          &:after {
+            content: ' ~ ';
+            color: blue;
+            font-weight: bold;
+            float: right;
+            padding-right: 10px;
+            font-size: 1.2rem;
+            line-height: 1.2rem;
+          }
+        }
+        .tree-node {
+          .value {
+            color: #000060;
+          }
+        }
+      }
+    }   
+  }
+  &.right-side {
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 0;
+
+    li {
+      position: relative;
+      display: table;
+      width: 100%;
+
+      .undo {
+        border-left: 1px solid #ddd;
+        font-size: 1.3rem;
+        line-height: 1.3rem;
+      }
+      .tree-node {
+        &.right-action {
+          &:after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 18px;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.02);
+            height: 100%;
+            border-left: 1px solid #ddd;
+            content: ' ';
+            display: block;
+          }
+        }
+      }
+
+      &.added {
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          pointer-events:none;
+          width: 90%;
+          top: 0;
+          left: 0;
+
+          &:after {
+            content: '+';
+            color: #4a4;
+            font-weight: bold;
+            padding-left: 5px;
+            font-size: 1.2rem;
+            line-height: 1.2rem;
+          }
+        }
+        .lower {
+          display: none;
+        }
+        .tree-node {
+          span {
+            color: #4a4;
+          }
+        }
+      }
+      &.removed {
+        .name, .value {
+          text-decoration-line: line-through;
+          text-decoration-color:  #962323;
+          opacity: 0.6;
+        }
+        .upper {
+          border-radius: 0 0 0 100%;
+          box-sizing: border-box;
+          height: 50%;
+          width: 10%;
+          position: absolute;
+          pointer-events:none;
+          top: 0;
+
+          &.depth-1 {
+            border: 2px solid #600000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #800000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #a00000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #c00000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #f00000;
+            border-top-width: 0;
+            border-right-width: 0;
+          }
+        }
+        .lower {
+          border-radius: 100% 0 0 0;
+          box-sizing: border-box;
+          height: 50%;
+          width: 10%;
+          position: absolute;
+          pointer-events:none;
+          bottom: 0;
+
+          &.depth-1 {
+            border: 2px solid #600000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-2 {
+            border: 2px dotted #800000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-3 {
+            border: 1px solid #a00000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-4 {
+            border: 1px dotted #c00000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+          &.depth-5 {
+            border: 1px dashed #f00000;
+            border-bottom-width: 0;
+            border-right-width: 0;
+          }
+        }
+      }
+      &.type-changed {
+        .tree-node {
+          span {
+            color: #962323;
+          }
+        }
+      }
+      &.name-changed {
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          pointer-events:none;
+          top: 0;
+          left: 0;
+
+          &:before {
+            content: ' ~ ';
+            color: blue;
+            font-weight: bold;
+            float: right;
+            padding-left: 5px;
+            font-size: 20px;
+            line-height: 16px;
+          }
+        }
+        .tree-node {
+          .name {
+            color: #000060;
+          }
+        }
+      }
+      &.value-changed {
+        .upper {
+          box-sizing: border-box;
+          height: 100%;
+          position: absolute;
+          pointer-events:none;
+          top: 0;
+          left: 0;
+
+          &:before {
+            content: ' ~ ';
+            color: blue;
+            font-weight: bold;
+            float: right;
+            padding-left: 5px;
+            font-size: 20px;
+            line-height: 16px;
+          }
+        }
+        .tree-node {
+          .value {
+            color: #000060;
+          }
+        }
+      }
+    }    
+  }
+  
+  .tree-node {
+    box-sizing: border-box;
+    color: #7c9eb2;
+    display: table;
+    padding: 0;
+    position: relative;
+    margin: 0;
+    width: 100%;
+
+    &.depth-0 {
+      padding-left: 5px;
+    }
+    &.depth-1 {
+      padding-left: 20px;
+    }
+    &.depth-2 {
+      padding-left: 40px;
+    }
+    &.depth-3 {
+      padding-left: 60px;
+    }
+    &.depth-4 {
+      padding-left: 80px;
+    }
+    &.depth-5 {
+      padding-left: 100px;
+    }
+    &.depth-6 {
+      padding-left: 120px;
+    }
+    &.depth-7 {
+      padding-left: 140px;
+    }
+    &.depth-8 {
+      padding-left: 160px;
+    }
+    &.depth-9 {
+      padding-left: 180px;
+    }
+    &.depth-10 {
+      padding-left: 200px;
+    }
+    
+    .name {
+      color: #444;
+      font-weight: bold;
+
+      &:after {
+        content: ':'
+      }
+    }
+    .value {
+      &.string:before {
+        content: '"';
+      }
+      &.string:after {
+        content: '"';
+      }
+    }
+  }
+}

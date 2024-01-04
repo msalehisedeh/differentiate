@@ -1,0 +1,42 @@
+{
+  "name": "@sedeh/differentiate",
+  "version": "3.1.0",
+  "peerDependencies": {
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "keywords": [
+    "angular",
+    "diff",
+    "diff tool",
+    "JSON",
+    "differ",
+    "difference",
+    "compare",
+    "compare tool",
+    "compare JSON",
+    "compare Objects",
+    "comparison",
+    "Object comparison",
+    "JSON comparison",
+    "revert back",
+    "merge",
+    "merge JSON",
+    "merge Objects",
+    "merge tool",
+    "compare and merge",
+    "nifty",
+    "visual",
+    "visual tool",
+    "pretty",
+    "lightweight",
+    "easy",
+    "best"
+  ],
+  "author": "Masoud Salehisedeh",
+  "license": "MIT"
+}
