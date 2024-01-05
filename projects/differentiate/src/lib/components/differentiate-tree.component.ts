@@ -8,16 +8,17 @@ import {
   OnInit,
   Input,
   Output,
-  EventEmitter,
-  ChangeDetectionStrategy
+  EventEmitter
 } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import {DifferentiateNodeStatus} from '../interfaces/differentiate.interfaces';
 
 @Component({
   selector: 'differentiate-tree',
+  standalone: true,
+  imports: [ CommonModule ],
   templateUrl: './differentiate-tree.component.html',
-  styleUrls: ['./differentiate-tree.component.scss'],
+  styleUrls: ['./differentiate-tree.component.scss']
 })
 export class DifferentiateTree implements OnInit{
   depth!: number;

@@ -11,6 +11,8 @@ import {
   EventEmitter,
   ChangeDetectionStrategy
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DifferentiateTree } from './differentiate-tree.component'
 
 import {
   DifferentiateNode,
@@ -21,6 +23,8 @@ import {
 
 @Component({
   selector: 'differentiate',
+  standalone: true,
+  imports: [ CommonModule, DifferentiateTree ],
   templateUrl: './differentiate.component.html',
   styleUrls: ['./differentiate.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -348,22 +352,28 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       if (!leftItemInRightSide && i < leftSide.length) {
         if (!rightSide.length) {
           while (i < leftSide.length) {
-            this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+            this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.added);
             j++;i++;
           }
         } else {
-          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+          const v = leftSide[i].value;
+          const c = leftSide[i].children?.length;
+          const status = v || c ? DifferentiateNodeStatus.added : DifferentiateNodeStatus.default;
+          this.copyInto(rightSide, leftSide[i], i, status);
           j++;i++;
         }
       }
       if (!rightItemInLeftSide && j < rightSide.length) {
         if (!leftSide.length) {
           while (j < rightSide.length) {
-            this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+            this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.removed);
             j++;i++;
           }
         } else {
-          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+          const v = rightSide[j].value;
+          const c = rightSide[j].children?.length;
+          const status = v || c ? DifferentiateNodeStatus.removed : DifferentiateNodeStatus.default;
+          this.copyInto(leftSide, rightSide[j], j, status);
           j++;i++;
         }
       }
@@ -380,7 +390,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             leftItemInRightSide = j < rightSide.length ? rightSide[j] : undefined;
             break;
           } else {
-            this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+            this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.added);
             j++;i++;
           }
         }  
@@ -392,7 +402,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
             rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
             break;
           } else {
-            this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+            this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.removed);
             j++;i++;
           }
         }
@@ -400,7 +410,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       if (leftItemInRightSide && i < leftSide.length) {
         let x = this.itemInArray(rightSide, leftSide[i]);
         if (x && x.index !== leftItemInRightSide.index) {
-          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
+          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.removed);
           j++;i++;
           leftItemInRightSide = j < rightSide.length ? rightSide[j] : undefined;
         }
@@ -408,15 +418,15 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       if (rightItemInLeftSide && j < rightSide.length) {
         let x = this.itemInArray(leftSide, rightSide[j]);
         if (x && x.index !== rightItemInLeftSide.index) {
-          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.added);
           j++;i++;
           rightItemInLeftSide = i < leftSide.length ? leftSide[i] : undefined;
         }
       }
       if (leftItemInRightSide && rightItemInLeftSide) {
         if (leftItemInRightSide.parent !== rightItemInLeftSide.parent) {
-          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.added);
-          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.removed);
+          this.copyInto(leftSide, rightSide[j], j, DifferentiateNodeStatus.removed);
+          this.copyInto(rightSide, leftSide[i], i, DifferentiateNodeStatus.added);
         } else {
           this.compare(leftItemInRightSide, rightItemInLeftSide);
         }

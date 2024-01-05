@@ -23,8 +23,8 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 ## Attributes
 | Attribute                |status    |Description                                                                                                                                  |
 |--------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-|caseSensitive             |Detection of differences is case sensitive.                                                                      |
-|expandible                |The result will be in expand/collapse sections                                                                   |
+|caseSensitive             |Optional  |Detection of differences is case sensitive.                                                                      |
+|expandible                |Optional  |The result will be in expand/collapse sections                                                                   |
 |leftSideObject            |Required  |JSON Object on left-hand side to be differentiated.  Default is undefined.                                                                   |
 |rightSideObject           |Required  |JSON Object on right-hand side to be differentiated. Default is undefined.                                                                   |
 |namedRootObject           |Optional  |Comma separated list of object string attributes to identify each root object when displaying differences between left and right hand sides. |
@@ -87,7 +87,7 @@ Include the **DifferentiateModule** module in your App module.
 ```javascript
 	import { BrowserModule } from '@angular/platform-browser';
 	import { NgModule } from '@angular/core';
-	import { DifferentiateModule } from 'differentiate';
+	import { DifferentiateComponent } from '@sedeh/differentiate';
 
 	import { AppComponent } from './app.component';
 
@@ -97,7 +97,7 @@ Include the **DifferentiateModule** module in your App module.
 	  ],
 	  imports: [
 		BrowserModule,
-		DifferentiateModule
+		DifferentiateComponent
 	  ],
 	  providers: [
 	  ],
@@ -112,7 +112,8 @@ It is that simple..!!
 
 | Version |Description                                                                                                                |
 |---------|---------------------------------------------------------------------------------------------------------------------------|
-|3.1.0    |fixed all issues raised 10,12,13, and 42. Also upgraded to Angular 15.                                                     |
+|3.2.0    |fixed [issue #13](https://github.com/msalehisedeh/differentiate/issues/13) and make component standalone                   |
+|3.1.0    |fixed all issues raised [issue #10](https://github.com/msalehisedeh/differentiate/issues/10), [issue #12](https://github.com/msalehisedeh/differentiate/issues/12), and [issue #42](https://github.com/msalehisedeh/differentiate/issues/42). Also upgraded to Angular 15.                                                     |
 |3.0.0    |upgrade to Angular 8                                                                                                       |
 |2.4.1    |fixed dependencies.                                                                                                        |
 |2.4.0    |Re-organizing libraries I am providing. Added scope to the project. From now on Accessing through @sedeh/differentiate.    |
