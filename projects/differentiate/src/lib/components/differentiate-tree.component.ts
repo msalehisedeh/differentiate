@@ -96,6 +96,7 @@ export class DifferentiateTree implements OnInit{
   childStatus(status: any) {
     let text = '';
     switch(status) {
+      case DifferentiateNodeStatus.extended: text = 'Modified in different location'; break;
       case DifferentiateNodeStatus.typeChanged: text = 'Type Changed'; break;
       case DifferentiateNodeStatus.nameChanged: text = 'Name Changed'; break;
       case DifferentiateNodeStatus.valueChanged: text = 'Value Changed'; break;

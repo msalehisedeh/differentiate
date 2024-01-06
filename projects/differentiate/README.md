@@ -112,6 +112,7 @@ It is that simple..!!
 
 | Version |Description                                                                                                                |
 |---------|---------------------------------------------------------------------------------------------------------------------------|
+|3.2.1    |adding status for items that are modified in other object within the JSON heigherarch                                      |
 |3.2.0    |fixed [issue #13](https://github.com/msalehisedeh/differentiate/issues/13) and make component standalone                   |
 |3.1.0    |fixed all issues raised [issue #10](https://github.com/msalehisedeh/differentiate/issues/10), [issue #12](https://github.com/msalehisedeh/differentiate/issues/12), and [issue #42](https://github.com/msalehisedeh/differentiate/issues/42). Also upgraded to Angular 15.                                                     |
 |3.0.0    |upgrade to Angular 8                                                                                                       |

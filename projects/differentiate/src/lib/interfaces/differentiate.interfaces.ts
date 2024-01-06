@@ -6,6 +6,7 @@ export enum DifferentiateNodeType {
   array = 4
 }
 export enum DifferentiateNodeStatus {
+  extended = 0,
   default = 1,
   typeChanged = 2,
   nameChanged = 3,

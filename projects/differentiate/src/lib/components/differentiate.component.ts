@@ -358,7 +358,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         } else {
           const v = leftSide[i].value;
           const c = leftSide[i].children?.length;
-          const status = v || c ? DifferentiateNodeStatus.added : DifferentiateNodeStatus.default;
+          const status = v || c ? DifferentiateNodeStatus.added : DifferentiateNodeStatus.extended;
           this.copyInto(rightSide, leftSide[i], i, status);
           j++;i++;
         }
@@ -372,7 +372,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         } else {
           const v = rightSide[j].value;
           const c = rightSide[j].children?.length;
-          const status = v || c ? DifferentiateNodeStatus.removed : DifferentiateNodeStatus.default;
+          const status = v || c ? DifferentiateNodeStatus.removed : DifferentiateNodeStatus.extended;
           this.copyInto(leftSide, rightSide[j], j, status);
           j++;i++;
         }

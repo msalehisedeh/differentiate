@@ -126,7 +126,12 @@ ul {
           }
         }
       }
-
+      &.extended {
+        .name, .value {
+          color: darkgrey;
+          font-style: italic;
+        }
+      }
       &.added {        
         .name, .value {
           opacity: 0.2;
@@ -323,7 +328,12 @@ ul {
           }
         }
       }
-
+      &.extended {
+        .name, .value {
+          color: darkgrey;
+          font-style: italic;
+        }
+      }
       &.added {
         .upper {
           box-sizing: border-box;
@@ -541,6 +551,7 @@ ul {
       }
     }
     .value {
+      padding-left: 5px;
       &.string:before {
         content: '"';
       }

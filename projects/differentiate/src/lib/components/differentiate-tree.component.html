@@ -14,6 +14,7 @@
     (mouseout)="depth === 2 ? mouseOvered($event, false, child.index) : null"
     (mouseover)="depth === 2 ? mouseOvered($event, true, child.index) : null"
     [class.hover]="child.hover"
+    [class.extended]="child.status === 0" 
     [class.added]="child.status === 5" 
     [class.removed]="child.status === 6" 
     [class.type-changed]="child.status === 2" 
