@@ -1,5 +1,5 @@
 {
-  "name": "@sedeh/differentiate",
+  "name": "differentiate",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",

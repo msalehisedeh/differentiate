@@ -17,7 +17,7 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 
 **I appreciate comments and requests.** please go to provided link and make your comments.
 
-[Live Demo](https://diffrenciate.stackblitz.io) | [Source code](https://github.com/msalehisedeh/differentiate/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
+[Live Demo](https://stackblitz.com/edit/diffrenciate?file=app%2Fapp.component.ts) | [Source code](https://github.com/msalehisedeh/differentiate/tree/master/src/app) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
 
 
 ## Attributes
