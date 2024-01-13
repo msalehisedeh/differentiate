@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "differentiate": {
+    "@sedeh/differentiate": {
       "projectType": "library",
       "root": "projects/differentiate",
       "sourceRoot": "projects/differentiate/src",
