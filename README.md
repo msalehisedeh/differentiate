@@ -9,10 +9,9 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 "+" / "-" characters on left-hand side as well as diverging line curves over a node of an object view represent adding/removing of an attribute or a node.
 "~" characters on left-hand side of a node represent change of value between two name/value pairs.
 
-**I appreciate comments and requests.** please go to provided link and make your comments.
-
 [Live Demo](https://stackblitz.com/edit/diffrenciate?file=app%2Fapp.component.ts) | [NPM ](https://www.npmjs.com/package/@sedeh/differentiate) | [Comments/Requests](https://github.com/msalehisedeh/differentiate/issues)
 
+**I appreciate comments and requests.** please go to provided link and make your comments.
 
 Sample view of the component at work! (You can create drop-downs and JSON log views to manipulate the **differentiate** component...)
 ![alt text](https://raw.githubusercontent.com/msalehisedeh/differentiate/master/sample.png "What you would see when a comparison is performed")

@@ -47,8 +47,6 @@ Differentiate is an Angular based code and will interpret changes deep in JSON h
 
 ```
 MODULE:
-  DifferentiateModule
-
 EXPORTS:
   DifferentiateComponent
   DifferentiateTree
