@@ -23,10 +23,10 @@ export class AppComponent {
   namedRootObject = "firstname";
   selectedIndex = 0;
   expandible = true;
-  selectedLeft;
-  selectedRight;
-  lefttree;
-  righttree;
+  selectedLeft = '';
+  selectedRight = '';
+  lefttree!: {};
+  righttree!: {};
   sampleJson: any;
   sample: any;
   expectedActions = ["fa fa-undo","fa fa-save"];
@@ -54,9 +54,11 @@ export class AppComponent {
       occupation: "composer",
       firstname: "daniel",
       lastname: "salehi",
+      friends: "none",
       address: {
         street: "545 beverly dr",
         city: "los angeles",
+        state: 'CA',
         countries: ["US","BS","CS"],
         data: [100, 500, 0, 20, 2000]
       },
@@ -129,10 +131,6 @@ export class AppComponent {
 
   constructor() {
     this.options = Object.keys(this.samplers);
-    this.selectedLeft = this.options[0];
-    this.selectedRight= this.options[1];
-    this.lefttree = this.samplers[this.selectedLeft];
-    this.righttree = this.samplers[this.selectedRight];
   }
 
   leftSideSelection(event: any) {
@@ -228,7 +226,7 @@ export class AppComponent {
     this.actions.push(event);
   }
   keys(map: any) {
-    return Object.keys(map);
+    return map ? Object.keys(map) : [];
   }
   evaluate(item: any) {
     return (typeof item === 'object')  ? JSON.stringify(item) : item;

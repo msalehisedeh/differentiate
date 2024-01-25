@@ -31,9 +31,9 @@ import {
 })
 export class DifferentiateComponent implements OnInit, OnChanges {
   
-  leftSide: any;
-  rightSide: any;
-  ready!: boolean;
+  leftSide: any = [];
+  rightSide: any = [];
+  ready = true;
   categorizeBy!: string[] | undefined;
 
   @Input("allowRevert")
