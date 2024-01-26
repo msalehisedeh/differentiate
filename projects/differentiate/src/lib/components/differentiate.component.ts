@@ -474,7 +474,6 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       changes.leftSideObject ||
       changes.namedRootObject ||
       changes.rightSideObject) {
-      this.ready = false;
       this.ngOnInit();
     }
   }
@@ -505,7 +504,8 @@ export class DifferentiateComponent implements OnInit, OnChanges {
     });
   }
   private init() {
-    if (this.leftSideObject && this.rightSideObject) {
+    if (this.leftSideObject || this.rightSideObject) {
+      this.ready = false;
       const left = (this.leftSideObject instanceof Array)  ? this.leftSideObject : [this.leftSideObject]
       const right = (this.rightSideObject instanceof Array)  ? this.rightSideObject : [this.rightSideObject]
       const comparision = this.toInternalStruction(left, right);
@@ -535,10 +535,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         isRoot: true,
         children: comparision.rightSide
       }];
-      setTimeout(()=>{
-        this.ready = true;
-        this.fireCountDifference();
-      },333);
+      setTimeout(()=>this.fireCountDifference(), 666);
     }
   }
   private fireCountDifference() {
@@ -559,6 +556,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         }
       });
     })
+    this.ready = true;
     this.ondifference.emit(diff);
   }
   private lookupChildOf(side: any, parentObject: any, id: any) {
@@ -618,7 +616,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
       });
       this.fireCountDifference();
-    }, 66);
+    }, 666);
   }
   private performAdvanceToLeft(leftSideInfo: any, rightSideInfo: any, status: any, i: number) {
     const modifiedChildren = this.rightSide[0].children[i].children;
@@ -659,11 +657,12 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
       });
       this.fireCountDifference();
-    }, 66);
+    }, 666);
   }
   advance(event: any) {
     const index = parseInt(event.node.path.split(",")[1]);
 
+    this.ready = false;
     if (event.type === 'advance') {
       this.performAdvanceToLeft(
         this.lookupChildOf(this.leftSide[0].children[index], this.leftSide[0], event.node.id), 

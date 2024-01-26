@@ -1,6 +1,6 @@
 {
   "name": "@sedeh/differentiate",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "peerDependencies": {
     "@angular/common": "^15.2.0",
     "@angular/core": "^15.2.0"
