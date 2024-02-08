@@ -33,7 +33,6 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   
   leftSide: any = [];
   rightSide: any = [];
-  ready = true;
   categorizeBy!: string[] | undefined;
 
   @Input("allowRevert")
@@ -474,12 +473,12 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       changes.leftSideObject ||
       changes.namedRootObject ||
       changes.rightSideObject) {
-      this.ngOnInit();
+      this.init();
     }
   }
 
   ngOnInit() {
-    setTimeout(()=>this.init(),666);
+    this.init();
   }
   private categorizedName(item: any) {
     let name = "";
@@ -505,7 +504,6 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   }
   private init() {
     if (this.leftSideObject || this.rightSideObject) {
-      this.ready = false;
       const left = (this.leftSideObject instanceof Array)  ? this.leftSideObject : [this.leftSideObject]
       const right = (this.rightSideObject instanceof Array)  ? this.rightSideObject : [this.rightSideObject]
       const comparision = this.toInternalStruction(left, right);
@@ -535,7 +533,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         isRoot: true,
         children: comparision.rightSide
       }];
-      setTimeout(()=>this.fireCountDifference(), 666);
+      this.fireCountDifference();
     }
   }
   private fireCountDifference() {
@@ -546,17 +544,18 @@ export class DifferentiateComponent implements OnInit, OnChanges {
       added: 0
     };
 
-    this.leftSide[0].children.map( (listItem: any) => {
-      listItem.children.map( (item: any) => {
-        switch (item.status) {
-          case DifferentiateNodeStatus.added: diff.added++; break;
-          case DifferentiateNodeStatus.removed: diff.removed++; break;
-          case DifferentiateNodeStatus.default: break;
-          default: diff.changed++; break;
-        }
-      });
-    })
-    this.ready = true;
+    if (this.leftSide.length && this.leftSide[0].children) {
+      this.leftSide[0].children.map( (listItem: any) => {
+        listItem.children.map( (item: any) => {
+          switch (item.status) {
+            case DifferentiateNodeStatus.added: diff.added++; break;
+            case DifferentiateNodeStatus.removed: diff.removed++; break;
+            case DifferentiateNodeStatus.default: break;
+            default: diff.changed++; break;
+          }
+        });
+      })
+    }
     this.ondifference.emit(diff);
   }
   private lookupChildOf(side: any, parentObject: any, id: any) {
@@ -616,7 +615,7 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
       });
       this.fireCountDifference();
-    }, 666);
+    }, 66);
   }
   private performAdvanceToLeft(leftSideInfo: any, rightSideInfo: any, status: any, i: number) {
     const modifiedChildren = this.rightSide[0].children[i].children;
@@ -657,12 +656,11 @@ export class DifferentiateComponent implements OnInit, OnChanges {
         node: this.transformNodeToOriginalStructure(modifiedChildren, DifferentiateNodeType.json)
       });
       this.fireCountDifference();
-    }, 666);
+    }, 66);
   }
   advance(event: any) {
     const index = parseInt(event.node.path.split(",")[1]);
 
-    this.ready = false;
     if (event.type === 'advance') {
       this.performAdvanceToLeft(
         this.lookupChildOf(this.leftSide[0].children[index], this.leftSide[0], event.node.id), 
@@ -685,8 +683,11 @@ export class DifferentiateComponent implements OnInit, OnChanges {
   }
   onhover(event: any) {
     const index = parseInt(event.path.split(",")[1]);
-
-    this.rightSide[0].children[index].children[event.index].hover = event.hover;
-    this.leftSide[0].children[index].children[event.index].hover = event.hover;
+    if (this.rightSide.length && this.rightSide[0].children && this.rightSide[0].children[index] && this.rightSide[0].children[index].children) {
+      this.rightSide[0].children[index].children[event.index].hover = event.hover;
+    }
+    if (this.leftSide.length && this.leftSide[0].children && this.leftSide[0].children[index] && this.leftSide[0].children[index].children) {
+        this.leftSide[0].children[index].children[event.index].hover = event.hover;
+    }
   }
 }

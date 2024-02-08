@@ -112,6 +112,7 @@ It is that simple..!!
 
 | Version |Description                                                                                                                |
 |---------|---------------------------------------------------------------------------------------------------------------------------|
+|3.2.4    |resolving issues raised.                                                                                                   |
 |3.2.3    |resolving issues raised.                                                                                                   |
 |3.2.2    |resolving issues raised.                                                                                                   |
 |3.2.1    |adding status for items that are modified in other object within the JSON heigherarch                                      |
